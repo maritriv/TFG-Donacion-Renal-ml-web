@@ -1,0 +1,329 @@
+{
+  "config": {
+    "target_column": "DONANTE_VALIDO",
+    "n_synthetic_mid": 2000,
+    "n_synthetic_transfer": 2000
+  },
+  "outputs": {
+    "mid_synthetic_path": "C:\\TFG-Donacion-Renal-ml-web\\data\\processed\\dataset_mid_synthetic.csv",
+    "transfer_synthetic_path": "C:\\TFG-Donacion-Renal-ml-web\\data\\processed\\dataset_transfer_synthetic.csv"
+  },
+  "mid": {
+    "engine": "bootstrap_independiente",
+    "columns": [
+      "EDAD",
+      "SEXO",
+      "IMC",
+      "GRUPO_SANGUINEO",
+      "CAUSA_FALLECIMIENTO_DANC",
+      "CARDIOCOMPRESION_EXTRAHOSPITALARIA",
+      "RECUPERACION_ALGUN_MOMENTO",
+      "ADRENALINA_N",
+      "COLESTEROL",
+      "DONANTE_VALIDO",
+      "CAPNOMETRIA_MEDIO"
+    ],
+    "n_real_rows": 70,
+    "n_synthetic_rows": 2000,
+    "column_types": {
+      "numeric": [
+        "EDAD",
+        "IMC",
+        "CARDIOCOMPRESION_EXTRAHOSPITALARIA",
+        "ADRENALINA_N",
+        "CAPNOMETRIA_MEDIO"
+      ],
+      "categorical": [
+        "SEXO",
+        "GRUPO_SANGUINEO",
+        "CAUSA_FALLECIMIENTO_DANC",
+        "RECUPERACION_ALGUN_MOMENTO",
+        "COLESTEROL",
+        "DONANTE_VALIDO"
+      ]
+    },
+    "validation": {
+      "real_shape": [
+        70,
+        11
+      ],
+      "synthetic_shape": [
+        2000,
+        11
+      ],
+      "target_distribution": {
+        "real": {
+          "0": 0.6285714285714286,
+          "1": 0.37142857142857144
+        },
+        "synthetic": {
+          "0": 0.65,
+          "1": 0.35
+        }
+      },
+      "numeric_summary": {
+        "EDAD": {
+          "real_mean": 47.0,
+          "real_std": 9.908274978192635,
+          "synthetic_mean": 46.89163596702136,
+          "synthetic_std": 9.672873839791674
+        },
+        "IMC": {
+          "real_mean": 27.39949168166755,
+          "real_std": 3.4537262079836366,
+          "synthetic_mean": 27.338329287893302,
+          "synthetic_std": 3.4718328381215624
+        },
+        "CARDIOCOMPRESION_EXTRAHOSPITALARIA": {
+          "real_mean": 0.2028985507246377,
+          "real_std": 0.40510384089716245,
+          "synthetic_mean": 0.2035,
+          "synthetic_std": 0.4027019175732947
+        },
+        "ADRENALINA_N": {
+          "real_mean": 8.285714285714286,
+          "real_std": 3.456323157960888,
+          "synthetic_mean": 8.3695,
+          "synthetic_std": 3.4304305381159406
+        },
+        "CAPNOMETRIA_MEDIO": {
+          "real_mean": 26.224137931034484,
+          "real_std": 14.796921329207185,
+          "synthetic_mean": 26.19524805178104,
+          "synthetic_std": 14.594050174346071
+        }
+      },
+      "categorical_summary": {
+        "SEXO": {
+          "real_top_freq": {
+            "0": 0.8714285714285714,
+            "1": 0.12857142857142856
+          },
+          "synthetic_top_freq": {
+            "0": 0.8845,
+            "1": 0.1155
+          }
+        },
+        "GRUPO_SANGUINEO": {
+          "real_top_freq": {
+            "1": 0.45714285714285713,
+            "0": 0.38571428571428573,
+            "2": 0.12857142857142856,
+            "3": 0.02857142857142857
+          },
+          "synthetic_top_freq": {
+            "1": 0.462,
+            "0": 0.3755,
+            "2": 0.1295,
+            "3": 0.033
+          }
+        },
+        "CAUSA_FALLECIMIENTO_DANC": {
+          "real_top_freq": {
+            "2": 0.5428571428571428,
+            "3": 0.24285714285714285,
+            "6": 0.08571428571428572,
+            "1": 0.05714285714285714,
+            "0": 0.05714285714285714
+          },
+          "synthetic_top_freq": {
+            "2": 0.544,
+            "3": 0.237,
+            "6": 0.0985,
+            "0": 0.0535,
+            "1": 0.0495
+          }
+        },
+        "RECUPERACION_ALGUN_MOMENTO": {
+          "real_top_freq": {
+            "0": 0.8428571428571429,
+            "1": 0.15714285714285714
+          },
+          "synthetic_top_freq": {
+            "0": 0.853,
+            "1": 0.147
+          }
+        },
+        "COLESTEROL": {
+          "real_top_freq": {
+            "0": 0.7428571428571429,
+            "1": 0.2571428571428571
+          },
+          "synthetic_top_freq": {
+            "0": 0.761,
+            "1": 0.239
+          }
+        },
+        "DONANTE_VALIDO": {
+          "real_top_freq": {
+            "0": 0.6285714285714286,
+            "1": 0.37142857142857144
+          },
+          "synthetic_top_freq": {
+            "0": 0.65,
+            "1": 0.35
+          }
+        }
+      }
+    }
+  },
+  "transfer": {
+    "engine": "bootstrap_independiente",
+    "columns": [
+      "EDAD",
+      "SEXO",
+      "IMC",
+      "GRUPO_SANGUINEO",
+      "CAUSA_FALLECIMIENTO_DANC",
+      "CARDIOCOMPRESION_EXTRAHOSPITALARIA",
+      "RECUPERACION_ALGUN_MOMENTO",
+      "ADRENALINA_N",
+      "COLESTEROL",
+      "DONANTE_VALIDO",
+      "CAPNOMETRIA_TRANSFERENCIA"
+    ],
+    "n_real_rows": 70,
+    "n_synthetic_rows": 2000,
+    "column_types": {
+      "numeric": [
+        "EDAD",
+        "IMC",
+        "CARDIOCOMPRESION_EXTRAHOSPITALARIA",
+        "ADRENALINA_N",
+        "CAPNOMETRIA_TRANSFERENCIA"
+      ],
+      "categorical": [
+        "SEXO",
+        "GRUPO_SANGUINEO",
+        "CAUSA_FALLECIMIENTO_DANC",
+        "RECUPERACION_ALGUN_MOMENTO",
+        "COLESTEROL",
+        "DONANTE_VALIDO"
+      ]
+    },
+    "validation": {
+      "real_shape": [
+        70,
+        11
+      ],
+      "synthetic_shape": [
+        2000,
+        11
+      ],
+      "target_distribution": {
+        "real": {
+          "0": 0.6285714285714286,
+          "1": 0.37142857142857144
+        },
+        "synthetic": {
+          "0": 0.6175,
+          "1": 0.3825
+        }
+      },
+      "numeric_summary": {
+        "EDAD": {
+          "real_mean": 47.0,
+          "real_std": 9.908274978192635,
+          "synthetic_mean": 47.39851818529413,
+          "synthetic_std": 9.887989933404487
+        },
+        "IMC": {
+          "real_mean": 27.39949168166755,
+          "real_std": 3.4537262079836366,
+          "synthetic_mean": 27.447642277997584,
+          "synthetic_std": 3.435727748100079
+        },
+        "CARDIOCOMPRESION_EXTRAHOSPITALARIA": {
+          "real_mean": 0.2028985507246377,
+          "real_std": 0.40510384089716245,
+          "synthetic_mean": 0.19,
+          "synthetic_std": 0.3923990169384311
+        },
+        "ADRENALINA_N": {
+          "real_mean": 8.285714285714286,
+          "real_std": 3.456323157960888,
+          "synthetic_mean": 8.352,
+          "synthetic_std": 3.610209523892374
+        },
+        "CAPNOMETRIA_TRANSFERENCIA": {
+          "real_mean": 22.79310344827586,
+          "real_std": 11.831801661222782,
+          "synthetic_mean": 22.583737166855986,
+          "synthetic_std": 11.381455820149313
+        }
+      },
+      "categorical_summary": {
+        "SEXO": {
+          "real_top_freq": {
+            "0": 0.8714285714285714,
+            "1": 0.12857142857142856
+          },
+          "synthetic_top_freq": {
+            "0": 0.878,
+            "1": 0.122
+          }
+        },
+        "GRUPO_SANGUINEO": {
+          "real_top_freq": {
+            "1": 0.45714285714285713,
+            "0": 0.38571428571428573,
+            "2": 0.12857142857142856,
+            "3": 0.02857142857142857
+          },
+          "synthetic_top_freq": {
+            "1": 0.453,
+            "0": 0.3955,
+            "2": 0.1285,
+            "3": 0.023
+          }
+        },
+        "CAUSA_FALLECIMIENTO_DANC": {
+          "real_top_freq": {
+            "2": 0.5428571428571428,
+            "3": 0.24285714285714285,
+            "6": 0.08571428571428572,
+            "1": 0.05714285714285714,
+            "0": 0.05714285714285714
+          },
+          "synthetic_top_freq": {
+            "2": 0.529,
+            "3": 0.249,
+            "6": 0.084,
+            "0": 0.064,
+            "1": 0.059
+          }
+        },
+        "RECUPERACION_ALGUN_MOMENTO": {
+          "real_top_freq": {
+            "0": 0.8428571428571429,
+            "1": 0.15714285714285714
+          },
+          "synthetic_top_freq": {
+            "0": 0.844,
+            "1": 0.156
+          }
+        },
+        "COLESTEROL": {
+          "real_top_freq": {
+            "0": 0.7428571428571429,
+            "1": 0.2571428571428571
+          },
+          "synthetic_top_freq": {
+            "0": 0.7365,
+            "1": 0.2635
+          }
+        },
+        "DONANTE_VALIDO": {
+          "real_top_freq": {
+            "0": 0.6285714285714286,
+            "1": 0.37142857142857144
+          },
+          "synthetic_top_freq": {
+            "0": 0.6175,
+            "1": 0.3825
+          }
+        }
+      }
+    }
+  }
+}

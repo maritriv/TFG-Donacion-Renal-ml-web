@@ -1,0 +1,16 @@
+[project]
+name = "renal-dcd-ml-web"
+version = "0.1.0"
+description = "TFG pipeline: limpieza, analisis y modelado para viabilidad de donacion renal."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "pandas>=3.0.0",
+  "openpyxl>=3.1.0",
+  "numpy>=1.26.0"
+]
+
+[project.optional-dependencies]
+synthetic = [
+  "sdv>=1.15.0"
+]
