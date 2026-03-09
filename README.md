@@ -93,7 +93,7 @@ Detalles de subdirectorios y archivos principales existentes:
 **1.** Clonar el repositorio:
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
+git clone https://github.com/maritriv/TFG-Donacion-Renal-ml-web.git
 cd TFG-Donacion-Renal-ml-web
 ```
 
@@ -139,4 +139,4 @@ uv run -m src.01_data_cleaning.generate_synthetic_data
 ## Recursos adicionales
 
 - [Memoria]()
-- [Repositorio a aplicacion movil]()
+- [Repositorio a aplicacion movil](https://github.com/maritriv/TFG-Donacion-Renal)
