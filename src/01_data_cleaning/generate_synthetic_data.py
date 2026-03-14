@@ -10,21 +10,50 @@ Ejecucion:
 
 from __future__ import annotations
 
+import warnings
+
+warnings.filterwarnings(
+    "ignore",
+    message="Unknown extension is not supported and will be removed",
+    category=UserWarning,
+)
+
+warnings.filterwarnings(
+    "ignore",
+    message="The 'SingleTableMetadata' is deprecated.*",
+    category=FutureWarning,
+)
+
+warnings.filterwarnings(
+    "ignore",
+    message="We strongly recommend saving the metadata.*",
+    category=UserWarning,
+)
+
 try:
-    # Modo modulo: uv run -m src.01_data_cleaning.generate_synthetic_data
+    from .modules.cleaning_pipeline import run_cleaning_pipeline
     from .modules.synthetic_pipeline import run_synthetic_pipeline
-    from .modules.visual_logger import configure_visual_logger
+    from .modules.visual_logger import configure_visual_logger, log_banner, log_step
 except ImportError:
-    # Modo script directo: python src/01_data_cleaning/generate_synthetic_data.py
+    from modules.cleaning_pipeline import run_cleaning_pipeline
     from modules.synthetic_pipeline import run_synthetic_pipeline
-    from modules.visual_logger import configure_visual_logger
+    from modules.visual_logger import configure_visual_logger, log_banner, log_step
+
+try:
+    from .modules.synthetic_pipeline import run_synthetic_pipeline
+    from .modules.visual_logger import configure_visual_logger, log_banner, log_success
+except ImportError:
+    from modules.synthetic_pipeline import run_synthetic_pipeline
+    from modules.visual_logger import configure_visual_logger, log_banner, log_success
 
 
 def main() -> None:
     """Arranca la fase sintetica con trazas visuales por terminal."""
     logger = configure_visual_logger("generate_synthetic_data")
+    log_banner(logger, "EJECUCION SOLO SINTETICO", style="bold magenta")
     try:
         run_synthetic_pipeline(logger)
+        log_success("SINTETICO FINALIZADO CORRECTAMENTE")
     except Exception as exc:
         logger.error("Fallo en pipeline sintetico: %s", exc, exc_info=True)
         raise

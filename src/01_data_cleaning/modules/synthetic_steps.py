@@ -1,37 +1,77 @@
 """Funciones de negocio para generacion sintetica tabular.
 
-Incluye deteccion de tipos de variable, entrenamiento de sintetizador
-(SDV/CTGAN o fallback), muestreo y validacion basica real vs sintetico.
+Incluye deteccion de tipos de variable, entrenamiento de CTGAN,
+muestreo y validacion real vs sintetico.
 """
 
 from __future__ import annotations
 
 import json
 import logging
+import re
+import unicodedata
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 
-from .config import TARGET_COLUMN
+from .config import (
+    RANDOM_STATE,
+    SYNTHETIC_BINARY_COLUMNS,
+    SYNTHETIC_NUMERIC_LIMITS,
+    TARGET_COLUMN,
+)
 
 logger = logging.getLogger("synthetic_steps")
+
+
+EXPLICIT_CATEGORICAL_COLUMNS = {
+    "SEXO",
+    "GRUPO_SANGUINEO",
+    "CAUSA_FALLECIMIENTO_DANC",
+    TARGET_COLUMN,
+}
+
+EXPLICIT_NUMERIC_COLUMNS = {
+    "EDAD",
+    "IMC",
+    "ADRENALINA_N",
+    "COLESTEROL",
+    "CAPNOMETRIA_MEDIO",
+    "CAPNOMETRIA_TRANSFERENCIA",
+}
+
+
+def _strip_accents(text: str) -> str:
+    """Quita acentos para comparaciones robustas."""
+    normalized = unicodedata.normalize("NFKD", text)
+    return "".join(char for char in normalized if not unicodedata.combining(char))
+
+
+def _normalize_text_value(value: object) -> str:
+    """Normaliza texto para comparaciones."""
+    text = str(value).strip()
+    text = _strip_accents(text)
+    text = re.sub(r"\s+", " ", text)
+    return text.upper()
 
 
 def load_clean_datasets(mid_path: Path, transfer_path: Path) -> Dict[str, pd.DataFrame]:
     """Carga datasets limpios de MID y TRANSFERENCIA."""
     paths = {"mid": mid_path, "transfer": transfer_path}
     datasets: Dict[str, pd.DataFrame] = {}
+
     for name, path in paths.items():
         if not path.exists():
             raise FileNotFoundError(f"No existe dataset limpio ({name}): {path}")
         datasets[name] = pd.read_csv(path)
+
     return datasets
 
 
 def detect_column_types(df: pd.DataFrame, target_col: str = TARGET_COLUMN) -> Dict[str, List[str]]:
-    """Detecta columnas numericas y categoricas para tabular synthesis."""
+    """Detecta columnas numericas y categoricas para sintesis tabular."""
     categorical_cols: List[str] = []
     numeric_cols: List[str] = []
 
@@ -40,8 +80,21 @@ def detect_column_types(df: pd.DataFrame, target_col: str = TARGET_COLUMN) -> Di
             categorical_cols.append(col)
             continue
 
+        if col.endswith("_MISSING"):
+            categorical_cols.append(col)
+            continue
+
+        if col in EXPLICIT_CATEGORICAL_COLUMNS:
+            categorical_cols.append(col)
+            continue
+
+        if col in EXPLICIT_NUMERIC_COLUMNS:
+            numeric_cols.append(col)
+            continue
+
         series = df[col]
-        if pd.api.types.is_object_dtype(series) or pd.api.types.is_categorical_dtype(series):
+
+        if pd.api.types.is_object_dtype(series) or isinstance(series.dtype, pd.CategoricalDtype):
             categorical_cols.append(col)
             continue
 
@@ -49,7 +102,6 @@ def detect_column_types(df: pd.DataFrame, target_col: str = TARGET_COLUMN) -> Di
             categorical_cols.append(col)
             continue
 
-        # Enteros con cardinalidad baja se tratan como categoricos clinicos.
         if pd.api.types.is_integer_dtype(series) and series.nunique(dropna=True) <= 12:
             categorical_cols.append(col)
             continue
@@ -59,64 +111,32 @@ def detect_column_types(df: pd.DataFrame, target_col: str = TARGET_COLUMN) -> Di
     return {"numeric": numeric_cols, "categorical": categorical_cols}
 
 
-class BootstrapSynthesizer:
-    """Fallback simple de sintesis independiente por columna."""
-
-    def __init__(self, df: pd.DataFrame, column_types: Dict[str, List[str]]) -> None:
-        self.df = df.copy()
-        self.column_types = column_types
-
-    def sample(self, num_rows: int) -> pd.DataFrame:
-        """Genera muestras con bootstrap por columna."""
-        data = {}
-        for col in self.df.columns:
-            source = self.df[col].dropna()
-            if source.empty:
-                data[col] = [np.nan] * num_rows
-                continue
-
-            if col in self.column_types["numeric"]:
-                numeric_source = pd.to_numeric(source, errors="coerce").dropna()
-                if numeric_source.empty:
-                    data[col] = [np.nan] * num_rows
-                    continue
-
-                sampled = np.random.choice(numeric_source.values, size=num_rows, replace=True)
-                if numeric_source.nunique() > 15:
-                    std = float(np.nanstd(numeric_source.values))
-                    if std > 0:
-                        noise = np.random.normal(loc=0.0, scale=std * 0.03, size=num_rows)
-                        sampled = sampled + noise
-                data[col] = sampled
-            else:
-                data[col] = np.random.choice(source.values, size=num_rows, replace=True)
-
-        return pd.DataFrame(data, columns=self.df.columns)
-
-
 def train_synthesizer(
-    df: pd.DataFrame, column_types: Dict[str, List[str]]
+    df: pd.DataFrame,
+    column_types: Dict[str, List[str]],
 ) -> Tuple[object, str]:
-    """Entrena CTGAN (SDV) si existe; si no, usa fallback bootstrap."""
+    """Entrena CTGAN mediante SDV. Es requisito obligatorio del proyecto."""
+    _ = column_types  # Se mantiene por consistencia de interfaz
+
     try:
         from sdv.metadata import SingleTableMetadata
         from sdv.single_table import CTGANSynthesizer
+    except ImportError as exc:
+        raise ImportError(
+            "La generacion sintetica requiere SDV/CTGAN. "
+            "Instala la dependencia con 'uv sync --extra synthetic' "
+            "o con 'pip install sdv'."
+        ) from exc
 
-        metadata = SingleTableMetadata()
-        try:
-            metadata.detect_from_dataframe(data=df)
-        except TypeError:
-            metadata.detect_from_dataframe(df)
+    metadata = SingleTableMetadata()
+    try:
+        metadata.detect_from_dataframe(data=df)
+    except TypeError:
+        metadata.detect_from_dataframe(df)
 
-        synthesizer = CTGANSynthesizer(metadata)
-        synthesizer.fit(df)
-        return synthesizer, "sdv_ctgan"
-    except ImportError:
-        logger.warning("SDV no instalado. Se usara fallback bootstrap.")
-    except Exception as exc:
-        logger.warning("Fallo al entrenar CTGAN (%s). Se usara fallback bootstrap.", exc)
-
-    return BootstrapSynthesizer(df=df, column_types=column_types), "bootstrap_independiente"
+    synthesizer = CTGANSynthesizer(metadata)
+    synthesizer.fit(df)
+    return synthesizer, "sdv_ctgan"
 
 
 def normalize_target_column(series: pd.Series) -> pd.Series:
@@ -128,20 +148,90 @@ def normalize_target_column(series: pd.Series) -> pd.Series:
         "NO": 0,
         "TRUE": 1,
         "FALSE": 0,
+        "VERDADERO": 1,
+        "FALSO": 0,
     }
 
     def map_value(value: object) -> Optional[int]:
         if pd.isna(value):
             return np.nan
+
         if isinstance(value, (int, float, np.integer, np.floating)):
             if value == 1:
                 return 1
             if value == 0:
                 return 0
             return np.nan
-        return mapping.get(str(value).strip().upper(), np.nan)
+
+        return mapping.get(_normalize_text_value(value), np.nan)
 
     return series.map(map_value)
+
+
+def _force_binary_columns(df: pd.DataFrame, binary_columns: List[str]) -> Tuple[pd.DataFrame, Dict[str, int]]:
+    """Fuerza columnas binarias a valores 0/1."""
+    output = df.copy()
+    corrections: Dict[str, int] = {}
+
+    for col in binary_columns:
+        if col not in output.columns:
+            continue
+
+        before = output[col].copy()
+        numeric = pd.to_numeric(output[col], errors="coerce")
+        valid_mask = numeric.notna()
+
+        output.loc[valid_mask, col] = (numeric[valid_mask] >= 0.5).astype(int)
+        corrections[col] = int((before[valid_mask] != output.loc[valid_mask, col]).sum())
+
+    return output, corrections
+
+
+def apply_synthetic_clinical_constraints(
+    synth_df: pd.DataFrame,
+    real_df: pd.DataFrame,
+    target_col: str = TARGET_COLUMN,
+) -> Tuple[pd.DataFrame, Dict[str, object]]:
+    """Aplica constraints clinicos simples y consistencia post-sintesis."""
+    output = synth_df.copy()
+    clipped_columns: Dict[str, int] = {}
+
+    for col, limits in SYNTHETIC_NUMERIC_LIMITS.items():
+        if col not in output.columns:
+            continue
+
+        output[col] = pd.to_numeric(output[col], errors="coerce")
+        before = output[col].copy()
+
+        min_value = limits.get("min")
+        max_value = limits.get("max")
+
+        if min_value is not None:
+            output[col] = output[col].clip(lower=min_value)
+        if max_value is not None:
+            output[col] = output[col].clip(upper=max_value)
+
+        clipped_columns[col] = int((before != output[col]).fillna(False).sum())
+
+    output, binary_corrections = _force_binary_columns(output, SYNTHETIC_BINARY_COLUMNS)
+
+    if target_col in output.columns:
+        output[target_col] = normalize_target_column(output[target_col])
+        real_target_mode = normalize_target_column(real_df[target_col]).dropna().mode()
+        if not real_target_mode.empty:
+            output[target_col] = output[target_col].fillna(int(real_target_mode.iloc[0]))
+        output[target_col] = output[target_col].astype(int)
+
+    remaining_nulls = output.isna().sum()
+    remaining_nulls = remaining_nulls[remaining_nulls > 0].sort_values(ascending=False)
+
+    report = {
+        "numeric_clipped_counts": clipped_columns,
+        "binary_corrections": binary_corrections,
+        "remaining_null_total": int(remaining_nulls.sum()),
+        "remaining_nulls_by_column": {str(col): int(v) for col, v in remaining_nulls.items()},
+    }
+    return output, report
 
 
 def generate_synthetic_samples(
@@ -170,18 +260,22 @@ def validate_synthetic_dataset(
     column_types: Dict[str, List[str]],
     target_col: str = TARGET_COLUMN,
 ) -> Dict[str, object]:
-    """Compara dataset real vs sintetico con metricas descriptivas basicas."""
+    """Compara dataset real vs sintetico con metricas descriptivas y validaciones basicas."""
     report: Dict[str, object] = {
         "real_shape": [int(real_df.shape[0]), int(real_df.shape[1])],
         "synthetic_shape": [int(synth_df.shape[0]), int(synth_df.shape[1])],
+        "synthetic_exact_duplicates": int(synth_df.duplicated().sum()),
+        "synthetic_remaining_null_total": int(synth_df.isna().sum().sum()),
     }
 
     if target_col in real_df.columns and target_col in synth_df.columns:
         real_target = normalize_target_column(real_df[target_col]).value_counts(
-            normalize=True, dropna=False
+            normalize=True,
+            dropna=False,
         )
         synth_target = normalize_target_column(synth_df[target_col]).value_counts(
-            normalize=True, dropna=False
+            normalize=True,
+            dropna=False,
         )
         report["target_distribution"] = {
             "real": {str(k): float(v) for k, v in real_target.items()},
@@ -192,13 +286,25 @@ def validate_synthetic_dataset(
     for col in column_types["numeric"]:
         if col not in real_df.columns or col not in synth_df.columns:
             continue
+
         real_num = pd.to_numeric(real_df[col], errors="coerce")
         synth_num = pd.to_numeric(synth_df[col], errors="coerce")
+
         numeric_summary[col] = {
             "real_mean": float(real_num.mean()) if real_num.notna().any() else None,
             "real_std": float(real_num.std()) if real_num.notna().any() else None,
+            "real_min": float(real_num.min()) if real_num.notna().any() else None,
+            "real_max": float(real_num.max()) if real_num.notna().any() else None,
+            "real_q25": float(real_num.quantile(0.25)) if real_num.notna().any() else None,
+            "real_q50": float(real_num.quantile(0.50)) if real_num.notna().any() else None,
+            "real_q75": float(real_num.quantile(0.75)) if real_num.notna().any() else None,
             "synthetic_mean": float(synth_num.mean()) if synth_num.notna().any() else None,
             "synthetic_std": float(synth_num.std()) if synth_num.notna().any() else None,
+            "synthetic_min": float(synth_num.min()) if synth_num.notna().any() else None,
+            "synthetic_max": float(synth_num.max()) if synth_num.notna().any() else None,
+            "synthetic_q25": float(synth_num.quantile(0.25)) if synth_num.notna().any() else None,
+            "synthetic_q50": float(synth_num.quantile(0.50)) if synth_num.notna().any() else None,
+            "synthetic_q75": float(synth_num.quantile(0.75)) if synth_num.notna().any() else None,
         }
     report["numeric_summary"] = numeric_summary
 
@@ -206,6 +312,7 @@ def validate_synthetic_dataset(
     for col in column_types["categorical"]:
         if col not in real_df.columns or col not in synth_df.columns:
             continue
+
         real_freq = real_df[col].astype(str).value_counts(normalize=True).head(5)
         synth_freq = synth_df[col].astype(str).value_counts(normalize=True).head(5)
         categorical_summary[col] = {
@@ -213,6 +320,17 @@ def validate_synthetic_dataset(
             "synthetic_top_freq": {str(k): float(v) for k, v in synth_freq.items()},
         }
     report["categorical_summary"] = categorical_summary
+
+    numeric_cols_for_corr = [
+        col for col in column_types["numeric"]
+        if col in real_df.columns and col in synth_df.columns
+    ]
+    if len(numeric_cols_for_corr) >= 2:
+        real_corr = real_df[numeric_cols_for_corr].apply(pd.to_numeric, errors="coerce").corr()
+        synth_corr = synth_df[numeric_cols_for_corr].apply(pd.to_numeric, errors="coerce").corr()
+
+        corr_diff = (real_corr - synth_corr).abs()
+        report["correlation_difference_mean_abs"] = float(np.nanmean(corr_diff.values))
 
     return report
 

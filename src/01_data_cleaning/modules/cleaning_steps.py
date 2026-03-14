@@ -22,6 +22,15 @@ from .config import TARGET_COLUMN
 logger = logging.getLogger("cleaning_steps")
 
 
+NUMERIC_VALIDATION_RULES: Dict[str, Dict[str, Optional[float]]] = {
+    "EDAD": {"min": 0, "max": 100},
+    "CAPNOMETRIA_MEDIO": {"min": 0, "max": 100},
+    "CAPNOMETRIA_TRANSFERENCIA": {"min": 0, "max": 100},
+    "IMC": {"min": 0.01, "max": 80},
+    "ADRENALINA_N": {"min": 0, "max": 50},
+}
+
+
 def load_donor_sheet(excel_path: Path, sheet_name: str) -> pd.DataFrame:
     """Carga la hoja Donante desde Excel."""
     if not excel_path.exists():
@@ -41,6 +50,14 @@ def _normalize_column_name(column_name: object) -> str:
     text = _strip_accents(text)
     text = re.sub(r"[^A-Za-z0-9]+", "_", text)
     text = re.sub(r"_+", "_", text).strip("_")
+    return text.upper()
+
+
+def _normalize_text_value(value: object) -> str:
+    """Normaliza un valor textual para comparaciones robustas."""
+    text = str(value).strip()
+    text = _strip_accents(text)
+    text = re.sub(r"\s+", " ", text)
     return text.upper()
 
 
@@ -76,31 +93,159 @@ def remove_duplicates(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, int]]:
     }
 
 
-def drop_high_null_columns(
-    df: pd.DataFrame,
-    threshold: float,
-    protected_columns: Optional[Sequence[str]] = None,
-) -> Tuple[pd.DataFrame, List[str], Dict[str, float], List[str]]:
-    """Elimina columnas por exceso de nulos excepto columnas protegidas."""
+def analyze_null_ratio(df: pd.DataFrame) -> Dict[str, float]:
+    """Devuelve porcentaje de nulos por columna (orden descendente)."""
     null_ratio = df.isna().mean().sort_values(ascending=False)
-    protected = set(protected_columns or [])
-    dropped = [col for col, ratio in null_ratio.items() if ratio > threshold and col not in protected]
-    protected_over_threshold = [
-        col for col, ratio in null_ratio.items() if ratio > threshold and col in protected
+    return {str(col): float(ratio) for col, ratio in null_ratio.items()}
+
+
+def create_missing_indicators(
+    df: pd.DataFrame,
+    source_columns: Sequence[str],
+    suffix: str = "_MISSING",
+) -> Tuple[pd.DataFrame, List[str], List[str], Dict[str, int]]:
+    """Crea indicadores binarios de missing para columnas clinicas clave."""
+    output = df.copy()
+    created: List[str] = []
+    source_missing: List[str] = []
+    missing_counts: Dict[str, int] = {}
+
+    for col in source_columns:
+        if col not in output.columns:
+            source_missing.append(col)
+            continue
+        indicator = f"{col}{suffix}"
+        output[indicator] = output[col].isna().astype(int)
+        created.append(indicator)
+        missing_counts[indicator] = int(output[indicator].sum())
+
+    return output, created, source_missing, missing_counts
+
+
+def detect_variable_types(
+    df: pd.DataFrame,
+    binary_candidate_columns: Sequence[str],
+    numeric_exclude_columns: Optional[Sequence[str]] = None,
+) -> Tuple[List[str], List[str], List[str]]:
+    """Separa columnas en numericas, categoricas y binarias."""
+    binary_columns = [col for col in binary_candidate_columns if col in df.columns]
+    numeric_excluded = set(numeric_exclude_columns or [])
+
+    numeric_columns = [
+        col
+        for col in df.select_dtypes(include=["number"]).columns
+        if col not in binary_columns and col not in numeric_excluded
     ]
-    cleaned = df.drop(columns=dropped, errors="ignore").copy()
-    return (
-        cleaned,
-        dropped,
-        {str(col): float(ratio) for col, ratio in null_ratio.items()},
-        protected_over_threshold,
-    )
+    categorical_columns = list(df.select_dtypes(include=["object", "category", "string"]).columns)
+    return numeric_columns, categorical_columns, binary_columns
+
+
+def impute_numeric_with_median(
+    df: pd.DataFrame,
+    numeric_columns: Sequence[str],
+    fallback_value: float = 0.0,
+) -> Tuple[pd.DataFrame, Dict[str, int], List[str]]:
+    """Imputa nulos en numericas con mediana; si toda la columna es NaN usa fallback."""
+    output = df.copy()
+    filled_counts: Dict[str, int] = {}
+    fallback_used_columns: List[str] = []
+
+    for col in numeric_columns:
+        if col not in output.columns:
+            continue
+
+        output[col] = pd.to_numeric(output[col], errors="coerce")
+        missing_before = int(output[col].isna().sum())
+        if missing_before == 0:
+            continue
+
+        non_null_count = int(output[col].notna().sum())
+        if non_null_count == 0:
+            fill_value = fallback_value
+            fallback_used_columns.append(col)
+        else:
+            median_value = output[col].median(skipna=True)
+            fill_value = float(median_value)
+
+        output[col] = output[col].fillna(fill_value)
+        missing_after = int(output[col].isna().sum())
+        filled_counts[col] = int(missing_before - missing_after)
+
+    return output, filled_counts, fallback_used_columns
+
+
+def impute_categorical_with_label(
+    df: pd.DataFrame,
+    categorical_columns: Sequence[str],
+    fill_value: str,
+) -> Tuple[pd.DataFrame, Dict[str, int]]:
+    """Imputa nulos categoricos con una etiqueta explicita."""
+    output = df.copy()
+    filled_counts: Dict[str, int] = {}
+
+    for col in categorical_columns:
+        if col not in output.columns:
+            continue
+        missing_before = int(output[col].isna().sum())
+        if missing_before == 0:
+            continue
+
+        if isinstance(output[col].dtype, pd.CategoricalDtype):
+            if fill_value not in output[col].cat.categories:
+                output[col] = output[col].cat.add_categories([fill_value])
+
+        output[col] = output[col].fillna(fill_value)
+        missing_after = int(output[col].isna().sum())
+        filled_counts[col] = int(missing_before - missing_after)
+
+    return output, filled_counts
+
+
+def impute_binary_with_mode(
+    df: pd.DataFrame,
+    binary_columns: Sequence[str],
+    fallback_value: int = 0,
+) -> Tuple[pd.DataFrame, Dict[str, int], Dict[str, int], List[str]]:
+    """Imputa nulos en binarias con la moda; si no existe usa fallback."""
+    output = df.copy()
+    filled_counts: Dict[str, int] = {}
+    mode_used_by_column: Dict[str, int] = {}
+    fallback_used_columns: List[str] = []
+
+    for col in binary_columns:
+        if col not in output.columns:
+            continue
+        missing_before = int(output[col].isna().sum())
+        if missing_before == 0:
+            continue
+
+        mode_values = output[col].dropna().mode()
+        if mode_values.empty:
+            fill_value = fallback_value
+            fallback_used_columns.append(col)
+        else:
+            fill_value = int(mode_values.iloc[0])
+
+        output[col] = output[col].fillna(fill_value)
+        missing_after = int(output[col].isna().sum())
+        filled_counts[col] = int(missing_before - missing_after)
+        mode_used_by_column[col] = int(fill_value)
+
+    return output, filled_counts, mode_used_by_column, fallback_used_columns
+
+
+def summarize_remaining_nulls(df: pd.DataFrame) -> Tuple[int, Dict[str, int]]:
+    """Resume nulos restantes para validacion final del pipeline."""
+    remaining = df.isna().sum()
+    remaining = remaining[remaining > 0].sort_values(ascending=False)
+    return int(remaining.sum()), {str(col): int(value) for col, value in remaining.items()}
 
 
 def drop_manual_columns(
-    df: pd.DataFrame, manual_columns: Sequence[str]
+    df: pd.DataFrame,
+    manual_columns: Sequence[str],
 ) -> Tuple[pd.DataFrame, List[str], List[str]]:
-    """Elimina columnas irrelevantes/fuga sin romper si faltan."""
+    """Elimina columnas irrelevantes o con fuga sin romper si faltan."""
     existing = [col for col in manual_columns if col in df.columns]
     missing = [col for col in manual_columns if col not in df.columns]
     cleaned = df.drop(columns=existing, errors="ignore").copy()
@@ -119,9 +264,11 @@ def map_binary_value(value: object) -> Optional[int]:
             return 0
         return np.nan
 
-    text = str(value).strip().upper()
-    positives = {"1", "SI", "S", "YES", "Y", "TRUE", "T"}
+    text = _normalize_text_value(value)
+
+    positives = {"1", "SI", "S", "YES", "Y", "TRUE", "T", "VERDADERO", "V"}
     negatives = {"0", "NO", "N", "FALSE", "F"}
+
     if text in positives:
         return 1
     if text in negatives:
@@ -130,43 +277,62 @@ def map_binary_value(value: object) -> Optional[int]:
 
 
 def clean_binary_columns(
-    df: pd.DataFrame, candidate_columns: Sequence[str]
-) -> Tuple[pd.DataFrame, Dict[str, int]]:
-    """Convierte columnas binarias detectadas a 0/1 y cuenta valores no mapeables."""
+    df: pd.DataFrame,
+    candidate_columns: Sequence[str],
+) -> Tuple[pd.DataFrame, Dict[str, int], Dict[str, List[str]]]:
+    """Convierte columnas binarias detectadas a 0/1 y reporta valores no mapeables."""
     output = df.copy()
     issue_count: Dict[str, int] = {}
+    issue_examples: Dict[str, List[str]] = {}
 
     for col in candidate_columns:
         if col not in output.columns:
             continue
+
         before = output[col].copy()
-        output[col] = output[col].map(map_binary_value)
-        issue_count[col] = int(before.notna().sum() - output[col].notna().sum())
-    return output, issue_count
+        mapped = before.map(map_binary_value)
+        output[col] = mapped
+
+        invalid_mask = before.notna() & mapped.isna()
+        issue_count[col] = int(invalid_mask.sum())
+
+        if invalid_mask.any():
+            examples = sorted({str(v) for v in before[invalid_mask].tolist()})
+            issue_examples[col] = examples[:10]
+
+    return output, issue_count, issue_examples
 
 
-def clean_numeric_columns(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, int]]:
+def clean_numeric_columns(
+    df: pd.DataFrame,
+) -> Tuple[pd.DataFrame, Dict[str, int], Dict[str, Dict[str, Optional[float]]]]:
     """Valida columnas numericas y transforma valores imposibles a NaN."""
     output = df.copy()
     anomaly_counts: Dict[str, int] = {}
+    rules_applied: Dict[str, Dict[str, Optional[float]]] = {}
 
-    rules = {
-        "EDAD": lambda s: s < 0,
-        "CAPNOMETRIA_MEDIO": lambda s: s < 0,
-        "CAPNOMETRIA_TRANSFERENCIA": lambda s: s < 0,
-        "IMC": lambda s: (s <= 0) | (s > 80),
-        "ADRENALINA_N": lambda s: s < 0,
-    }
-
-    for col, invalid_rule in rules.items():
+    for col, limits in NUMERIC_VALIDATION_RULES.items():
         if col not in output.columns:
             continue
+
         output[col] = pd.to_numeric(output[col], errors="coerce")
-        invalid_mask = invalid_rule(output[col]) & output[col].notna()
+        invalid_mask = pd.Series(False, index=output.index)
+
+        min_value = limits.get("min")
+        max_value = limits.get("max")
+
+        if min_value is not None:
+            invalid_mask = invalid_mask | (output[col] < min_value)
+        if max_value is not None:
+            invalid_mask = invalid_mask | (output[col] > max_value)
+
+        invalid_mask = invalid_mask & output[col].notna()
+
         anomaly_counts[col] = int(invalid_mask.sum())
+        rules_applied[col] = {"min": min_value, "max": max_value}
         output.loc[invalid_mask, col] = np.nan
 
-    return output, anomaly_counts
+    return output, anomaly_counts, rules_applied
 
 
 def create_target(df: pd.DataFrame, drop_undefined_rows: bool = True) -> Tuple[pd.DataFrame, Dict[str, int]]:
@@ -182,11 +348,14 @@ def create_target(df: pd.DataFrame, drop_undefined_rows: bool = True) -> Tuple[p
     right = df[right_col].map(map_binary_value)
     left = df[left_col].map(map_binary_value)
 
+    output = df.copy()
+    output[right_col] = right
+    output[left_col] = left
+
     target = pd.Series(np.nan, index=df.index, dtype="float")
     target[(right == 1) | (left == 1)] = 1
     target[(right == 0) & (left == 0)] = 0
 
-    output = df.copy()
     output[TARGET_COLUMN] = target
 
     undefined_rows = int(output[TARGET_COLUMN].isna().sum())
@@ -199,6 +368,8 @@ def create_target(df: pd.DataFrame, drop_undefined_rows: bool = True) -> Tuple[p
 
     distribution = output[TARGET_COLUMN].value_counts(dropna=False).to_dict()
     stats = {
+        "right_kidney_missing_after_binary_mapping": int(right.isna().sum()),
+        "left_kidney_missing_after_binary_mapping": int(left.isna().sum()),
         "target_valid_1": int((output[TARGET_COLUMN] == 1).sum()),
         "target_invalid_0": int((output[TARGET_COLUMN] == 0).sum()),
         "target_undefined_before_drop": undefined_rows,
@@ -216,6 +387,7 @@ def select_optional_temporal_columns(
     """Selecciona temporales disponibles con bajo porcentaje de nulos."""
     selected: List[str] = []
     null_ratios: Dict[str, float] = {}
+
     for col in candidate_columns:
         if col not in df.columns:
             continue
@@ -223,6 +395,7 @@ def select_optional_temporal_columns(
         null_ratios[col] = ratio
         if ratio <= max_null_ratio:
             selected.append(col)
+
     return selected, null_ratios
 
 
@@ -282,6 +455,103 @@ def build_transfer_dataset(
         optional_temporal_columns=selected_temporal,
     )
     return dataset, existing, missing, temporal_null_ratios
+
+
+def treat_missing_values_for_model_dataset(
+    df: pd.DataFrame,
+    numeric_columns: Sequence[str],
+    categorical_columns: Sequence[str],
+    binary_columns: Sequence[str],
+    indicator_source_columns: Optional[Sequence[str]] = None,
+    categorical_fill_value: str = "DESCONOCIDO",
+) -> Tuple[pd.DataFrame, Dict[str, object]]:
+    """Trata nulos en un dataset final de modelado sin eliminar columnas."""
+    output = df.copy()
+
+    numeric_columns = [col for col in numeric_columns if col != TARGET_COLUMN and col in output.columns]
+    categorical_columns = [col for col in categorical_columns if col != TARGET_COLUMN and col in output.columns]
+    binary_columns = [col for col in binary_columns if col != TARGET_COLUMN and col in output.columns]
+
+    created_indicators: List[str] = []
+    missing_indicator_sources: List[str] = []
+    indicator_missing_counts: Dict[str, int] = {}
+
+    if indicator_source_columns:
+        output, created_indicators, missing_indicator_sources, indicator_missing_counts = create_missing_indicators(
+            df=output,
+            source_columns=indicator_source_columns,
+        )
+
+    output, numeric_filled_counts, numeric_fallback_columns = impute_numeric_with_median(
+        df=output,
+        numeric_columns=numeric_columns,
+    )
+
+    output, categorical_filled_counts = impute_categorical_with_label(
+        df=output,
+        categorical_columns=categorical_columns,
+        fill_value=categorical_fill_value,
+    )
+
+    output, binary_filled_counts, binary_mode_used, binary_fallback_columns = impute_binary_with_mode(
+        df=output,
+        binary_columns=binary_columns,
+    )
+
+    remaining_null_total, remaining_nulls_by_column = summarize_remaining_nulls(output)
+
+    report = {
+        "missing_indicators_created": created_indicators,
+        "missing_indicator_source_columns_not_found": missing_indicator_sources,
+        "missing_indicator_positive_counts": indicator_missing_counts,
+        "numeric_missing_filled": numeric_filled_counts,
+        "numeric_fallback_columns": numeric_fallback_columns,
+        "categorical_missing_filled": categorical_filled_counts,
+        "categorical_fill_value": categorical_fill_value,
+        "binary_missing_filled": binary_filled_counts,
+        "binary_mode_used": binary_mode_used,
+        "binary_fallback_columns": binary_fallback_columns,
+        "remaining_null_total": remaining_null_total,
+        "remaining_nulls_by_column": remaining_nulls_by_column,
+    }
+
+    return output, report
+
+
+def validate_final_dataset_for_model(
+    df: pd.DataFrame,
+    dataset_name: str,
+    required_columns: Optional[Sequence[str]] = None,
+    forbidden_columns: Optional[Sequence[str]] = None,
+) -> Dict[str, object]:
+    """Valida condiciones mínimas del dataset final antes de guardarlo."""
+    issues: List[str] = []
+
+    if TARGET_COLUMN not in df.columns:
+        issues.append(f"{dataset_name}: falta la columna target {TARGET_COLUMN}")
+
+    if df.columns.duplicated().any():
+        issues.append(f"{dataset_name}: hay columnas duplicadas")
+
+    forbidden = set(forbidden_columns or [])
+    suspicious = [col for col in df.columns if col in forbidden]
+    if suspicious:
+        issues.append(f"{dataset_name}: columnas no permitidas detectadas: {suspicious}")
+
+    required_missing = [col for col in (required_columns or []) if col not in df.columns]
+    if required_missing:
+        issues.append(f"{dataset_name}: faltan columnas requeridas: {required_missing}")
+
+    remaining_null_total, remaining_nulls_by_column = summarize_remaining_nulls(df)
+
+    return {
+        "dataset_name": dataset_name,
+        "rows": int(df.shape[0]),
+        "columns": int(df.shape[1]),
+        "issues": issues,
+        "remaining_null_total": remaining_null_total,
+        "remaining_nulls_by_column": remaining_nulls_by_column,
+    }
 
 
 def save_outputs(

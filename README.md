@@ -17,36 +17,55 @@ En la fase actual se ha implementado la **primera capa del pipeline de datos**, 
 ## Estructura general del repositorio
 ```text
 TFG-Donacion-Renal-ml-web/
+|-- .gitignore
+|-- pyproject.toml
+|-- README.md
+|-- uv.lock
 |-- data/
-|   |-- raw/                              <- Datos originales (Excel fuente)
-|   |-- processed/                        <- Salidas limpias, sinteticas y reportes JSON
-|   `-- external/                         <- Datos externos (reservado)
+|   |-- external/
+|   |   `-- .gitkeep
+|   |-- processed/
+|   |   |-- .gitkeep
+|   |   |-- cleaning_report.json
+|   |   |-- dataset_mid_clean.csv
+|   |   |-- dataset_mid_synthetic.csv
+|   |   |-- dataset_transfer_clean.csv
+|   |   |-- dataset_transfer_synthetic.csv
+|   |   `-- synthetic_report.json
+|   `-- raw/
+|       |-- .gitkeep
+|       `-- dataset_medicos.xlsx
 |-- docs/
-|   |-- README.md                         <- Documentacion interna
-|   `-- pipeline_overview.md              <- Resumen del pipeline
+|   |-- .gitkeep
+|   |-- pipeline_overview.md
+|   `-- README.md
 |-- src/
-|   |-- 01_data_cleaning/                 <- Fase actual del pipeline
-|   |   |-- main.py                       <- Ejecuta limpieza + sintetico
-|   |   |-- clean_data.py                 <- Ejecuta solo limpieza
-|   |   |-- generate_synthetic_data.py    <- Ejecuta solo sintetico
+|   |-- 01_data_cleaning/
+|   |   |-- clean_data.py
+|   |   |-- generate_synthetic_data.py
+|   |   |-- main.py
+|   |   |-- __init__.py
 |   |   `-- modules/
-|   |       |-- config.py                 <- Configuracion central de la fase
-|   |       |-- visual_logger.py          <- Logging visual por pasos
-|   |       |-- cleaning_steps.py         <- Funciones de negocio de limpieza
-|   |       |-- cleaning_pipeline.py      <- Orquestador de limpieza
-|   |       |-- synthetic_steps.py        <- Funciones de negocio de sintesis
-|   |       `-- synthetic_pipeline.py     <- Orquestador de sintetico
-|   |-- 02_exploratory_analysis/          <- Reservado para fases posteriores
-|   |-- 03_model_training/                <- Reservado para fases posteriores
-|   |-- 04_model_evaluation/              <- Reservado para fases posteriores
-|   `-- 05_final_model_export/            <- Reservado para fases posteriores
-|-- tests/                                <- Tests (pendiente de ampliacion)
+|   |       |-- cleaning_pipeline.py
+|   |       |-- cleaning_steps.py
+|   |       |-- config.py
+|   |       |-- synthetic_pipeline.py
+|   |       |-- synthetic_steps.py
+|   |       |-- visual_logger.py
+|   |       `-- __init__.py
+|   |-- 03_model_training/
+|   |   `-- __init__.py
+|   |-- 04_model_evaluation/
+|   |   `-- train.py
+|   `-- 05_final_model_export/
+|       `-- __init__.py
+|-- tests/
+|   `-- .gitkeep
 |-- web/
-|   |-- backend/                          <- Pendiente de implementacion
-|   `-- frontend/                         <- Pendiente de implementacion
-|-- pyproject.toml                        <- Configuracion del proyecto y dependencias
-|-- uv.lock                               <- Lockfile de uv
-`-- .gitignore                            <- Exclusion de archivos no versionables
+|   |-- backend/
+|   |   `-- .gitkeep
+|   `-- frontend/
+|       `-- .gitkeep
 ```
 
 ---
@@ -66,6 +85,9 @@ Detalles de subdirectorios y archivos principales existentes:
             - Archivo `cleaning_pipeline.py`: Define y ejecuta la secuencia completa de limpieza.
             - Archivo `synthetic_steps.py`: Contiene funciones de sintesis y validacion estadistica basica.
             - Archivo `synthetic_pipeline.py`: Define y ejecuta la secuencia completa de sintesis.
+    - Directorio __`03_model_training/`__: Espacio base para la etapa de entrenamiento.
+    - Directorio __`04_model_evaluation/`__: Incluye `train.py` para pruebas de entrenamiento/evaluacion.
+    - Directorio __`05_final_model_export/`__: Espacio reservado para exportacion del modelo final.
 
 - Directorio __`data/`__: Datos de entrada y salidas del pipeline.
     - Directorio `raw/`: Datos originales (incluye `dataset_medicos.xlsx`).
@@ -81,6 +103,9 @@ Detalles de subdirectorios y archivos principales existentes:
 - Directorio __`docs/`__: Documentacion tecnica complementaria.
     - Archivo `pipeline_overview.md`: Resumen del funcionamiento del pipeline.
     - Archivo `README.md`: Nota de entrada a la documentacion del directorio.
+
+- Directorio __`tests/`__: Carpeta de pruebas (actualmente mantenida con `.gitkeep`).
+- Directorio __`web/`__: Estructura inicial de aplicacion (`backend/` y `frontend/`, ambas con `.gitkeep`).
 
 - Archivo __`pyproject.toml`__: Define metadatos del proyecto y dependencias con `uv`.
 - Archivo __`uv.lock`__: Congela versiones de dependencias para reproducibilidad.
@@ -103,13 +128,13 @@ cd TFG-Donacion-Renal-ml-web
 pip install uv
 ```
 
-**3.** Crear entorno e instalar dependencias:
+**3.** Instalar dependencias:
 
 ```bash
 uv sync
 ```
 
-**4.** (Opcional) Instalar dependencia de sintesis avanzada (SDV/CTGAN):
+**4.** Instalar dependenciaS de sintesis avanzada (CTGAN):
 
 ```bash
 uv sync --extra synthetic
@@ -127,6 +152,15 @@ uv run -m src.01_data_cleaning.clean_data
 # Solo sintetico
 uv run -m src.01_data_cleaning.generate_synthetic_data
 ```
+
+**Outputs generados:**
+En data/processed/ se generan:
+- dataset_mid_clean.csv
+- dataset_transfer_clean.csv
+- cleaning_report.json
+- dataset_mid_synthetic.csv
+- dataset_transfer_synthetic.csv
+- synthetic_report.json
 
 ---
 
