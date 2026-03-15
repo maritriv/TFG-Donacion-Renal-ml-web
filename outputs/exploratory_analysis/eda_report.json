@@ -1,0 +1,200 @@
+{
+  "mid": {
+    "basic_summary": {
+      "rows": 70,
+      "columns": 13,
+      "missing_total": 0,
+      "duplicated_rows": 0,
+      "target_distribution": {
+        "0": 44,
+        "1": 26
+      }
+    },
+    "numeric_summary": {
+      "EDAD": {
+        "mean": 47.0,
+        "std": 9.908274978192635,
+        "min": 18.0,
+        "q25": 43.25,
+        "median": 49.0,
+        "q75": 52.0,
+        "max": 63.0
+      },
+      "IMC": {
+        "mean": 27.401616220020742,
+        "std": 3.4286539420176534,
+        "min": 20.06920415224914,
+        "q25": 24.72743013283554,
+        "median": 27.548209366391188,
+        "q75": 29.387755102040817,
+        "max": 37.17578426606422
+      },
+      "ADRENALINA_N": {
+        "mean": 8.285714285714286,
+        "std": 3.456323157960888,
+        "min": 1.0,
+        "q25": 6.0,
+        "median": 8.0,
+        "q75": 9.0,
+        "max": 21.0
+      },
+      "CAPNOMETRIA_MEDIO": {
+        "mean": 25.757142857142856,
+        "std": 13.488519771697337,
+        "min": 4.0,
+        "q25": 18.0,
+        "median": 23.5,
+        "q75": 32.0,
+        "max": 100.0
+      }
+    },
+    "categorical_summary": {
+      "SEXO": {
+        "0": 0.8714285714285714,
+        "1": 0.12857142857142856
+      },
+      "GRUPO_SANGUINEO": {
+        "1": 0.45714285714285713,
+        "0": 0.38571428571428573,
+        "2": 0.12857142857142856,
+        "3": 0.02857142857142857
+      },
+      "CAUSA_FALLECIMIENTO_DANC": {
+        "2": 0.5428571428571428,
+        "3": 0.24285714285714285,
+        "6": 0.08571428571428572,
+        "1": 0.05714285714285714,
+        "0": 0.05714285714285714,
+        "5": 0.014285714285714285
+      },
+      "CARDIOCOMPRESION_EXTRAHOSPITALARIA": {
+        "0.0": 0.8,
+        "1.0": 0.2
+      },
+      "RECUPERACION_ALGUN_MOMENTO": {
+        "0": 0.8428571428571429,
+        "1": 0.15714285714285714
+      },
+      "COLESTEROL": {
+        "0": 0.7428571428571429,
+        "1": 0.2571428571428571
+      },
+      "CAPNOMETRIA_MEDIO_MISSING": {
+        "0": 0.8285714285714286,
+        "1": 0.17142857142857143
+      },
+      "ADRENALINA_N_MISSING": {
+        "0": 1.0
+      }
+    },
+    "plots": {
+      "histograms": [
+        "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\mid_hist_edad.png",
+        "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\mid_hist_imc.png",
+        "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\mid_hist_adrenalina_n.png",
+        "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\mid_hist_capnometria_medio.png"
+      ],
+      "target_distribution": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\mid_target_distribution.png",
+      "correlation_heatmap": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\mid_correlation_heatmap.png"
+    }
+  },
+  "transfer": {
+    "basic_summary": {
+      "rows": 70,
+      "columns": 13,
+      "missing_total": 0,
+      "duplicated_rows": 0,
+      "target_distribution": {
+        "0": 44,
+        "1": 26
+      }
+    },
+    "numeric_summary": {
+      "EDAD": {
+        "mean": 47.0,
+        "std": 9.908274978192635,
+        "min": 18.0,
+        "q25": 43.25,
+        "median": 49.0,
+        "q75": 52.0,
+        "max": 63.0
+      },
+      "IMC": {
+        "mean": 27.401616220020742,
+        "std": 3.4286539420176534,
+        "min": 20.06920415224914,
+        "q25": 24.72743013283554,
+        "median": 27.548209366391188,
+        "q75": 29.387755102040817,
+        "max": 37.17578426606422
+      },
+      "ADRENALINA_N": {
+        "mean": 8.285714285714286,
+        "std": 3.456323157960888,
+        "min": 1.0,
+        "q25": 6.0,
+        "median": 8.0,
+        "q75": 9.0,
+        "max": 21.0
+      },
+      "CAPNOMETRIA_TRANSFERENCIA": {
+        "mean": 22.65714285714286,
+        "std": 10.758058273005544,
+        "min": 4.0,
+        "q25": 15.25,
+        "median": 22.0,
+        "q75": 26.0,
+        "max": 54.0
+      }
+    },
+    "categorical_summary": {
+      "SEXO": {
+        "0": 0.8714285714285714,
+        "1": 0.12857142857142856
+      },
+      "GRUPO_SANGUINEO": {
+        "1": 0.45714285714285713,
+        "0": 0.38571428571428573,
+        "2": 0.12857142857142856,
+        "3": 0.02857142857142857
+      },
+      "CAUSA_FALLECIMIENTO_DANC": {
+        "2": 0.5428571428571428,
+        "3": 0.24285714285714285,
+        "6": 0.08571428571428572,
+        "1": 0.05714285714285714,
+        "0": 0.05714285714285714,
+        "5": 0.014285714285714285
+      },
+      "CARDIOCOMPRESION_EXTRAHOSPITALARIA": {
+        "0.0": 0.8,
+        "1.0": 0.2
+      },
+      "RECUPERACION_ALGUN_MOMENTO": {
+        "0": 0.8428571428571429,
+        "1": 0.15714285714285714
+      },
+      "COLESTEROL": {
+        "0": 0.7428571428571429,
+        "1": 0.2571428571428571
+      },
+      "CAPNOMETRIA_TRANSFERENCIA_MISSING": {
+        "0": 0.8285714285714286,
+        "1": 0.17142857142857143
+      },
+      "ADRENALINA_N_MISSING": {
+        "0": 1.0
+      }
+    },
+    "plots": {
+      "histograms": [
+        "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\transfer_hist_edad.png",
+        "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\transfer_hist_imc.png",
+        "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\transfer_hist_adrenalina_n.png",
+        "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\transfer_hist_capnometria_transferencia.png"
+      ],
+      "target_distribution": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\transfer_target_distribution.png",
+      "correlation_heatmap": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\transfer_correlation_heatmap.png"
+    }
+  }
+}

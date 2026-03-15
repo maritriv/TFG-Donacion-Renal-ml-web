@@ -33,18 +33,18 @@ warnings.filterwarnings(
 try:
     from .modules.cleaning_pipeline import run_cleaning_pipeline
     from .modules.synthetic_pipeline import run_synthetic_pipeline
-    from .modules.visual_logger import configure_visual_logger, log_banner, log_step
+    from src.common.visual_logger import configure_visual_logger, log_banner, log_step
 except ImportError:
     from modules.cleaning_pipeline import run_cleaning_pipeline
     from modules.synthetic_pipeline import run_synthetic_pipeline
-    from modules.visual_logger import configure_visual_logger, log_banner, log_step
+    from src.common.visual_logger import configure_visual_logger, log_banner, log_step
 
 try:
     from .modules.cleaning_pipeline import run_cleaning_pipeline
-    from .modules.visual_logger import configure_visual_logger, log_banner, log_success
+    from src.common.visual_logger import configure_visual_logger, log_banner, log_success
 except ImportError:
     from modules.cleaning_pipeline import run_cleaning_pipeline
-    from modules.visual_logger import configure_visual_logger, log_banner, log_success
+    from src.common.visual_logger import configure_visual_logger, log_banner, log_success
 
 
 def main() -> None:

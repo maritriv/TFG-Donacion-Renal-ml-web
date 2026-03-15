@@ -53,6 +53,8 @@ TFG-Donacion-Renal-ml-web/
 |   |       |-- synthetic_steps.py
 |   |       |-- visual_logger.py
 |   |       `-- __init__.py
+|   |-- 02_exploratory_analysis
+|   |   `-- __init__.py
 |   |-- 03_model_training/
 |   |   `-- __init__.py
 |   |-- 04_model_evaluation/

@@ -35,7 +35,7 @@ from .synthetic_steps import (
     train_synthesizer,
     validate_synthetic_dataset,
 )
-from .visual_logger import (
+from src.common.visual_logger import (
     log_banner,
     log_dataset_table,
     log_kv,

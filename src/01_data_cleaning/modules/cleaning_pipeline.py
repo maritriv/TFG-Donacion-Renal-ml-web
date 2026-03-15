@@ -43,7 +43,7 @@ from .config import (
     TRANSFER_SPECIFIC_COLUMNS,
     UNKNOWN_CATEGORY_LABEL,
 )
-from .visual_logger import (
+from src.common.visual_logger import (
     log_banner,
     log_dataset_table,
     log_kv,
