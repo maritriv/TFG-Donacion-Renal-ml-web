@@ -6,6 +6,9 @@ import json
 from pathlib import Path
 from typing import Dict, Tuple
 
+import joblib
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -19,8 +22,8 @@ from sklearn.metrics import (
     recall_score,
     roc_auc_score,
 )
-from sklearn.model_selection import StratifiedKFold, train_test_split
-
+from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
+from sklearn.ensemble import VotingClassifier
 
 def load_dataset(csv_path: Path) -> pd.DataFrame:
     """Carga un dataset desde CSV."""
@@ -116,11 +119,7 @@ def cross_validate_model(
     summary: Dict[str, object] = {"fold_metrics": fold_metrics}
 
     for metric_name in metric_names:
-        values = [
-            fold[metric_name]
-            for fold in fold_metrics
-            if fold[metric_name] is not None
-        ]
+        values = [fold[metric_name] for fold in fold_metrics if fold[metric_name] is not None]
         if values:
             summary[f"{metric_name}_mean"] = float(np.mean(values))
             summary[f"{metric_name}_std"] = float(np.std(values))
@@ -129,6 +128,31 @@ def cross_validate_model(
             summary[f"{metric_name}_std"] = None
 
     return summary
+
+
+def tune_model_with_grid_search(
+    model,
+    param_grid: Dict[str, list],
+    x_train: pd.DataFrame,
+    y_train: pd.Series,
+    n_splits: int,
+    scoring: str,
+    random_state: int,
+) -> GridSearchCV:
+    """Ajusta hiperparametros mediante GridSearchCV estratificado."""
+    cv = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
+
+    search = GridSearchCV(
+        estimator=model,
+        param_grid=param_grid,
+        scoring=scoring,
+        cv=cv,
+        refit=True,
+        n_jobs=1,
+        verbose=0,
+    )
+    search.fit(x_train, y_train)
+    return search
 
 
 def train_and_evaluate_model(
@@ -158,6 +182,23 @@ def train_and_evaluate_model(
 
     return metrics
 
+def build_voting_classifier(best_models: Dict[str, object]):
+    """Construye un VotingClassifier a partir de modelos ya tuneados."""
+    
+    estimators = []
+
+    if "logistic_regression" in best_models:
+        estimators.append(("logistic", best_models["logistic_regression"]))
+
+    if "svm" in best_models:
+        estimators.append(("svm", best_models["svm"]))
+
+    return VotingClassifier(
+        estimators=estimators,
+        voting="soft",
+        weights=[1, 2],
+        n_jobs=1,
+    )
 
 def save_metrics(metrics: Dict[str, object], output_path: Path) -> None:
     """Guarda métricas en JSON."""
@@ -185,11 +226,25 @@ def save_confusion_matrix_plot(
     plt.close()
 
 
+def save_model(model, output_path: Path) -> None:
+    """Guarda el modelo entrenado."""
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(model, output_path)
+
+
+def save_grid_search_results(search: GridSearchCV, output_path: Path) -> None:
+    """Guarda los resultados completos del grid search."""
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(search.cv_results_).to_csv(output_path, index=False)
+
+
 def build_comparison_row(
     dataset_name: str,
     model_name: str,
     cv_metrics: Dict[str, object],
     test_metrics: Dict[str, object],
+    best_params: Dict[str, object] | None = None,
+    best_cv_score: float | None = None,
 ) -> Dict[str, object]:
     """Construye una fila de comparación entre modelos."""
     return {
@@ -213,6 +268,8 @@ def build_comparison_row(
         "test_recall": test_metrics["recall"],
         "test_f1": test_metrics["f1"],
         "test_roc_auc": test_metrics["roc_auc"],
+        "best_cv_score": best_cv_score,
+        "best_params": str(best_params) if best_params is not None else "",
     }
 
 

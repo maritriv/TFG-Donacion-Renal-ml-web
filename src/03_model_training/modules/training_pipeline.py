@@ -1,4 +1,4 @@
-"""Orquestador de la fase 03: entrenamiento de modelos."""
+"""Orquestador de la fase 03: entrenamiento de modelos tuneados."""
 
 from __future__ import annotations
 
@@ -7,27 +7,38 @@ from pathlib import Path
 import pandas as pd
 
 from .config import (
+    BASELINE_MODEL_NAME,
     CV_N_SPLITS,
     MID_CLEAN_FILENAME,
-    MODEL_NAMES,
+    MID_SYNTH_FILENAME,
     MODEL_OUTPUT_DIR_RELATIVE_PATH,
+    PARAM_GRIDS,
+    PRIMARY_SCORING,
     PROCESSED_DIR_RELATIVE_PATH,
     RANDOM_STATE,
     TARGET_COLUMN,
     TEST_SIZE,
     TRANSFER_CLEAN_FILENAME,
+    TRANSFER_SYNTH_FILENAME,
+    TUNED_MODEL_NAMES,
+    USE_VOTING_ENSEMBLE,
+    VOTING_MODEL_NAME,
 )
 from .model_factory import get_model
 from .training_steps import (
     build_comparison_row,
+    build_voting_classifier,
     cross_validate_model,
     load_dataset,
     make_train_test_split,
     save_comparison_table,
     save_confusion_matrix_plot,
+    save_grid_search_results,
     save_metrics,
+    save_model,
     split_features_target,
     train_and_evaluate_model,
+    tune_model_with_grid_search,
 )
 from src.common.visual_logger import (
     log_banner,
@@ -45,7 +56,7 @@ def project_root() -> Path:
 
 
 def run_training_pipeline(logger, use_synthetic: bool = False) -> None:
-    """Ejecuta entrenamiento con validación cruzada y test final."""
+    """Ejecuta train/test, tuning en train y evaluación final en test."""
     total_steps = 4
     root = project_root()
 
@@ -55,15 +66,17 @@ def run_training_pipeline(logger, use_synthetic: bool = False) -> None:
 
     mid_path = processed_dir / MID_CLEAN_FILENAME
     transfer_path = processed_dir / TRANSFER_CLEAN_FILENAME
-    mid_synth_path = processed_dir / "dataset_mid_synthetic.csv"
-    transfer_synth_path = processed_dir / "dataset_transfer_synthetic.csv"
+    mid_synth_path = processed_dir / MID_SYNTH_FILENAME
+    transfer_synth_path = processed_dir / TRANSFER_SYNTH_FILENAME
 
     log_banner(logger, f"INICIO MODEL TRAINING [{experiment_suffix.upper()}]", style="bold green")
     log_kv(logger, "Raiz del proyecto", root)
     log_kv(logger, "Random state", RANDOM_STATE)
     log_kv(logger, "Test size", TEST_SIZE)
     log_kv(logger, "CV folds", CV_N_SPLITS)
+    log_kv(logger, "Scoring principal", PRIMARY_SCORING)
     log_kv(logger, "Uso de datos sinteticos", use_synthetic)
+    log_kv(logger, "Voting ensemble", USE_VOTING_ENSEMBLE)
 
     log_step(logger, 1, total_steps, "Carga de datasets", style="green")
     mid_df = load_dataset(mid_path)
@@ -75,20 +88,12 @@ def run_training_pipeline(logger, use_synthetic: bool = False) -> None:
         mid_synth_df = load_dataset(mid_synth_path)
         transfer_synth_df = load_dataset(transfer_synth_path)
 
-    log_kv(logger, "MID shape", f"{mid_df.shape[0]} x {mid_df.shape[1]}")
-    log_kv(logger, "TRANSFER shape", f"{transfer_df.shape[0]} x {transfer_df.shape[1]}")
-
-    if use_synthetic:
-        log_kv(logger, "MID synthetic shape", f"{mid_synth_df.shape[0]} x {mid_synth_df.shape[1]}")
-        log_kv(
-            logger,
-            "TRANSFER synthetic shape",
-            f"{transfer_synth_df.shape[0]} x {transfer_synth_df.shape[1]}",
-        )
-
     comparison_rows = []
 
-    datasets_loop = [("mid", mid_df, mid_synth_df), ("transfer", transfer_df, transfer_synth_df)]
+    datasets_loop = [
+        ("mid", mid_df, mid_synth_df),
+        ("transfer", transfer_df, transfer_synth_df),
+    ]
 
     for dataset_name, df, synth_df in datasets_loop:
         log_step(logger, 2, total_steps, f"Preparacion dataset {dataset_name.upper()}", style="green")
@@ -106,35 +111,94 @@ def run_training_pipeline(logger, use_synthetic: bool = False) -> None:
             x_train = pd.concat([x_train_real, x_synth], axis=0).reset_index(drop=True)
             y_train = pd.concat([y_train_real, y_synth], axis=0).reset_index(drop=True)
         else:
-            x_synth = None
-            y_synth = None
             x_train = x_train_real
             y_train = y_train_real
 
-        log_kv(logger, f"{dataset_name.upper()} X train real", x_train_real.shape)
+        log_kv(logger, f"{dataset_name.upper()} X train", x_train.shape)
         log_kv(logger, f"{dataset_name.upper()} X test", x_test.shape)
-        log_kv(logger, f"{dataset_name.upper()} y train real", y_train_real.shape)
+        log_kv(logger, f"{dataset_name.upper()} y train", y_train.shape)
         log_kv(logger, f"{dataset_name.upper()} y test", y_test.shape)
 
-        if use_synthetic and x_synth is not None:
-            log_kv(logger, f"{dataset_name.upper()} synthetic", x_synth.shape)
-            log_kv(logger, f"{dataset_name.upper()} train total", x_train.shape)
+        log_step(logger, 3, total_steps, f"Tuning y entrenamiento {dataset_name.upper()}", style="green")
 
-        log_step(logger, 3, total_steps, f"Entrenamiento modelos {dataset_name.upper()}", style="green")
+        # =========================
+        # BASELINE SIN TUNING
+        # =========================
+        baseline_model = get_model(BASELINE_MODEL_NAME, random_state=RANDOM_STATE)
 
-        for model_name in MODEL_NAMES:
+        baseline_cv_metrics = cross_validate_model(
+            model=baseline_model,
+            x_train=x_train,
+            y_train=y_train,
+            n_splits=CV_N_SPLITS,
+            random_state=RANDOM_STATE,
+        )
+        baseline_test_metrics = train_and_evaluate_model(
+            model=baseline_model,
+            x_train=x_train,
+            y_train=y_train,
+            x_test=x_test,
+            y_test=y_test,
+        )
+
+        baseline_output_dir = output_dir / dataset_name / BASELINE_MODEL_NAME
+        save_metrics(baseline_cv_metrics, baseline_output_dir / "cv_metrics.json")
+        save_metrics(baseline_test_metrics, baseline_output_dir / "test_metrics.json")
+        save_confusion_matrix_plot(
+            confusion_matrix_values=baseline_test_metrics["confusion_matrix"],
+            output_path=baseline_output_dir / "confusion_matrix.png",
+            title=f"{dataset_name.upper()} - {BASELINE_MODEL_NAME} [{experiment_suffix}]",
+        )
+
+        comparison_rows.append(
+            build_comparison_row(
+                dataset_name=dataset_name,
+                model_name=BASELINE_MODEL_NAME,
+                cv_metrics=baseline_cv_metrics,
+                test_metrics=baseline_test_metrics,
+            )
+        )
+
+        log_summary_panel(
+            title=f"{dataset_name.upper()} · {BASELINE_MODEL_NAME} [{experiment_suffix}]",
+            data={
+                "cv_f1_mean": round(baseline_cv_metrics["f1_mean"], 4),
+                "test_f1": round(baseline_test_metrics["f1"], 4),
+                "test_recall": round(baseline_test_metrics["recall"], 4),
+            },
+            border_style="green",
+        )
+
+        # =========================
+        # MODELOS TUNEADOS
+        # =========================
+        best_models = {}
+
+        for model_name in TUNED_MODEL_NAMES:
             model = get_model(model_name, random_state=RANDOM_STATE)
 
-            cv_metrics = cross_validate_model(
+            search = tune_model_with_grid_search(
                 model=model,
+                param_grid=PARAM_GRIDS[model_name],
+                x_train=x_train,
+                y_train=y_train,
+                n_splits=CV_N_SPLITS,
+                scoring=PRIMARY_SCORING,
+                random_state=RANDOM_STATE,
+            )
+
+            best_model = search.best_estimator_
+            best_models[model_name] = best_model
+
+            tuned_cv_metrics = cross_validate_model(
+                model=best_model,
                 x_train=x_train,
                 y_train=y_train,
                 n_splits=CV_N_SPLITS,
                 random_state=RANDOM_STATE,
             )
-
-            test_metrics = train_and_evaluate_model(
-                model=model,
+            tuned_test_metrics = train_and_evaluate_model(
+                model=best_model,
                 x_train=x_train,
                 y_train=y_train,
                 x_test=x_test,
@@ -143,11 +207,20 @@ def run_training_pipeline(logger, use_synthetic: bool = False) -> None:
 
             model_output_dir = output_dir / dataset_name / model_name
 
-            save_metrics(cv_metrics, model_output_dir / "cv_metrics.json")
-            save_metrics(test_metrics, model_output_dir / "test_metrics.json")
-
+            save_metrics(
+                {
+                    "best_params": search.best_params_,
+                    "best_cv_score": float(search.best_score_),
+                    "primary_scoring": PRIMARY_SCORING,
+                },
+                model_output_dir / "best_result.json",
+            )
+            save_metrics(tuned_cv_metrics, model_output_dir / "cv_metrics.json")
+            save_metrics(tuned_test_metrics, model_output_dir / "test_metrics.json")
+            save_grid_search_results(search, model_output_dir / "grid_search_results.csv")
+            save_model(best_model, model_output_dir / "best_model.joblib")
             save_confusion_matrix_plot(
-                confusion_matrix_values=test_metrics["confusion_matrix"],
+                confusion_matrix_values=tuned_test_metrics["confusion_matrix"],
                 output_path=model_output_dir / "confusion_matrix.png",
                 title=f"{dataset_name.upper()} - {model_name} [{experiment_suffix}]",
             )
@@ -156,20 +229,76 @@ def run_training_pipeline(logger, use_synthetic: bool = False) -> None:
                 build_comparison_row(
                     dataset_name=dataset_name,
                     model_name=model_name,
-                    cv_metrics=cv_metrics,
-                    test_metrics=test_metrics,
+                    cv_metrics=tuned_cv_metrics,
+                    test_metrics=tuned_test_metrics,
+                    best_params=search.best_params_,
+                    best_cv_score=float(search.best_score_),
                 )
             )
 
             log_summary_panel(
                 title=f"{dataset_name.upper()} · {model_name} [{experiment_suffix}]",
                 data={
-                    "cv_f1_mean": None if cv_metrics["f1_mean"] is None else round(cv_metrics["f1_mean"], 4),
-                    "cv_recall_mean": None if cv_metrics["recall_mean"] is None else round(cv_metrics["recall_mean"], 4),
-                    "cv_balanced_accuracy_mean": None if cv_metrics["balanced_accuracy_mean"] is None else round(cv_metrics["balanced_accuracy_mean"], 4),
-                    "test_f1": round(test_metrics["f1"], 4),
-                    "test_recall": round(test_metrics["recall"], 4),
-                    "test_balanced_accuracy": round(test_metrics["balanced_accuracy"], 4),
+                    "best_cv_score": round(float(search.best_score_), 4),
+                    "cv_f1_mean": round(tuned_cv_metrics["f1_mean"], 4),
+                    "test_f1": round(tuned_test_metrics["f1"], 4),
+                    "test_recall": round(tuned_test_metrics["recall"], 4),
+                    "best_params": search.best_params_,
+                },
+                border_style="green",
+            )
+
+        # =========================
+        # VOTING ENSEMBLE CON MODELOS TUNEADOS
+        # =========================
+        if USE_VOTING_ENSEMBLE:
+            voting_model = build_voting_classifier(best_models)
+
+            voting_cv_metrics = cross_validate_model(
+                model=voting_model,
+                x_train=x_train,
+                y_train=y_train,
+                n_splits=CV_N_SPLITS,
+                random_state=RANDOM_STATE,
+            )
+
+            voting_test_metrics = train_and_evaluate_model(
+                model=voting_model,
+                x_train=x_train,
+                y_train=y_train,
+                x_test=x_test,
+                y_test=y_test,
+            )
+
+            voting_output_dir = output_dir / dataset_name / VOTING_MODEL_NAME
+
+            save_metrics(voting_cv_metrics, voting_output_dir / "cv_metrics.json")
+            save_metrics(voting_test_metrics, voting_output_dir / "test_metrics.json")
+            save_model(voting_model, voting_output_dir / "best_model.joblib")
+            save_confusion_matrix_plot(
+                confusion_matrix_values=voting_test_metrics["confusion_matrix"],
+                output_path=voting_output_dir / "confusion_matrix.png",
+                title=f"{dataset_name.upper()} - {VOTING_MODEL_NAME} [{experiment_suffix}]",
+            )
+
+            comparison_rows.append(
+                build_comparison_row(
+                    dataset_name=dataset_name,
+                    model_name=VOTING_MODEL_NAME,
+                    cv_metrics=voting_cv_metrics,
+                    test_metrics=voting_test_metrics,
+                    best_params=None,
+                    best_cv_score=voting_cv_metrics["f1_mean"],
+                )
+            )
+
+            log_summary_panel(
+                title=f"{dataset_name.upper()} · {VOTING_MODEL_NAME} [{experiment_suffix}]",
+                data={
+                    "best_cv_score": round(voting_cv_metrics["f1_mean"], 4),
+                    "cv_f1_mean": round(voting_cv_metrics["f1_mean"], 4),
+                    "test_f1": round(voting_test_metrics["f1"], 4),
+                    "test_recall": round(voting_test_metrics["recall"], 4),
                 },
                 border_style="green",
             )
@@ -183,14 +312,14 @@ def run_training_pipeline(logger, use_synthetic: bool = False) -> None:
         preview_rows.append([
             row["dataset"],
             row["model"],
-            row["cv_f1_mean"],
+            row["best_cv_score"] if row["best_cv_score"] is not None else row["cv_f1_mean"],
             row["test_f1"],
             row["test_recall"],
         ])
 
     log_table(
-        title=f"Resumen comparativo de modelos [{experiment_suffix}]",
-        columns=["Dataset", "Modelo", "CV F1 mean", "Test F1", "Test Recall"],
+        title=f"Resumen comparativo de modelos tuneados [{experiment_suffix}]",
+        columns=["Dataset", "Modelo", "Best CV / CV F1", "Test F1", "Test Recall"],
         rows=preview_rows,
         border_style="green",
     )
