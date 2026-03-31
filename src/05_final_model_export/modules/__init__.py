@@ -1,0 +1,1 @@
+"""Módulo de exportación final del modelo."""

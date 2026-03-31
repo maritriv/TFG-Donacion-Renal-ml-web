@@ -1,0 +1,20 @@
+{
+  "experiment_name": "real",
+  "selection_primary_metric": "test_f1",
+  "selection_secondary_metric": "test_recall",
+  "selected_dataset": "mid",
+  "selected_model_name": "random_forest",
+  "selected_model_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_training\\real\\mid\\random_forest\\best_model.joblib",
+  "comparison_csv_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_training\\real\\comparison\\models_comparison.csv",
+  "metrics": {
+    "test_accuracy": 0.7142857142857143,
+    "test_balanced_accuracy": 0.7333333333333334,
+    "test_precision": 0.5714285714285714,
+    "test_recall": 0.8,
+    "test_f1": 0.6666666666666666,
+    "test_roc_auc": 0.688888888888889,
+    "cv_f1_mean": 0.5936507936507935,
+    "best_cv_score": 0.5936507936507935
+  },
+  "best_params": "{'max_depth': None, 'min_samples_leaf': 4, 'n_estimators': 100}"
+}

@@ -26,16 +26,15 @@ TRANSFER_SYNTH_FILENAME = "dataset_transfer_synthetic.csv"
 SYNTH_REPORT_FILENAME = "synthetic_report.json"
 
 # Parametros generales
-RANDOM_STATE = 42
+RANDOM_STATE = 1
 NULL_THRESHOLD = 0.40
 TEMPORAL_MAX_NULL_RATIO = 0.20
 TARGET_COLUMN = "DONANTE_VALIDO"
 UNKNOWN_CATEGORY_LABEL = "DESCONOCIDO"
 
-# Tamaño de sintetico prudente para dataset pequeño
-# Recomendacion: no superar ~2x el tamaño real
-N_SYNTHETIC_MID = 140
-N_SYNTHETIC_TRANSFER = 140
+# Tamaño de sintetico para dataset pequeño
+N_SYNTHETIC_MID = 30
+N_SYNTHETIC_TRANSFER = 30
 
 # Columnas protegidas para no romper la creacion del target
 PROTECTED_COLUMNS_FOR_TARGET = [
@@ -43,7 +42,7 @@ PROTECTED_COLUMNS_FOR_TARGET = [
     "RINON_IZDO_VALIDO",
 ]
 
-# Columnas manualmente descartables (irrelevantes o posible fuga)
+# Columnas manualmente descartables
 MANUAL_DROP_COLUMNS = [
     "CODIGO_DONANTE_CORE",
     "CODIGO_DONANTE",

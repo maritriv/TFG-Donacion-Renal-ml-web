@@ -1,0 +1,25 @@
+{
+  "selected_dataset": "mid",
+  "selected_model_name": "random_forest",
+  "selected_model_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_training\\real\\mid\\random_forest\\best_model.joblib",
+  "evaluation_dataset_path": "C:\\TFG-Donacion-Renal-ml-web\\data\\processed\\dataset_mid_clean.csv",
+  "metrics": {
+    "accuracy": 0.7142857142857143,
+    "balanced_accuracy": 0.7333333333333334,
+    "precision": 0.5714285714285714,
+    "recall": 0.8,
+    "f1": 0.6666666666666666,
+    "confusion_matrix": [
+      [
+        6,
+        3
+      ],
+      [
+        1,
+        4
+      ]
+    ],
+    "test_size": 14,
+    "roc_auc": 0.688888888888889
+  }
+}

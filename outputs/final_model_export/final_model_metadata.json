@@ -1,0 +1,9 @@
+{
+  "selected_experiment": "real",
+  "selected_model_name": "random_forest",
+  "selected_dataset": "mid",
+  "original_model_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_training\\real\\mid\\random_forest\\best_model.joblib",
+  "exported_model_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\final_model_export\\final_model.joblib",
+  "selection_summary_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_training\\real\\best_model_summary.json",
+  "evaluation_report_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_evaluation\\final_evaluation_report.json"
+}

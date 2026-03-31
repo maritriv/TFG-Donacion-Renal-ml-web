@@ -23,6 +23,9 @@ from .config import (
     TUNED_MODEL_NAMES,
     USE_VOTING_ENSEMBLE,
     VOTING_MODEL_NAME,
+    BEST_MODEL_SUMMARY_FILENAME,
+    SELECTION_PRIMARY_METRIC,
+    SELECTION_SECONDARY_METRIC,
 )
 from .model_factory import get_model
 from .training_steps import (
@@ -39,6 +42,8 @@ from .training_steps import (
     split_features_target,
     train_and_evaluate_model,
     tune_model_with_grid_search,
+    save_best_model_summary,
+    select_best_model,
 )
 from src.common.visual_logger import (
     log_banner,
@@ -303,7 +308,7 @@ def run_training_pipeline(logger, use_synthetic: bool = False) -> None:
                 border_style="green",
             )
 
-    log_step(logger, 4, total_steps, "Guardado comparativa global", style="green")
+        log_step(logger, 4, total_steps, "Guardado comparativa global y seleccion final", style="green")
     comparison_path = output_dir / "comparison" / "models_comparison.csv"
     save_comparison_table(comparison_rows, comparison_path)
 
@@ -324,12 +329,62 @@ def run_training_pipeline(logger, use_synthetic: bool = False) -> None:
         border_style="green",
     )
 
+    best_row = select_best_model(
+        rows=comparison_rows,
+        primary_metric=SELECTION_PRIMARY_METRIC,
+        secondary_metric=SELECTION_SECONDARY_METRIC,
+    )
+
+    best_model_path = (
+        output_dir
+        / best_row["dataset"]
+        / best_row["model"]
+        / "best_model.joblib"
+    )
+
+    best_summary = {
+        "experiment_name": experiment_suffix,
+        "selection_primary_metric": SELECTION_PRIMARY_METRIC,
+        "selection_secondary_metric": SELECTION_SECONDARY_METRIC,
+        "selected_dataset": best_row["dataset"],
+        "selected_model_name": best_row["model"],
+        "selected_model_path": str(best_model_path),
+        "comparison_csv_path": str(comparison_path),
+        "metrics": {
+            "test_accuracy": best_row["test_accuracy"],
+            "test_balanced_accuracy": best_row["test_balanced_accuracy"],
+            "test_precision": best_row["test_precision"],
+            "test_recall": best_row["test_recall"],
+            "test_f1": best_row["test_f1"],
+            "test_roc_auc": best_row["test_roc_auc"],
+            "cv_f1_mean": best_row["cv_f1_mean"],
+            "best_cv_score": best_row["best_cv_score"],
+        },
+        "best_params": best_row["best_params"],
+    }
+
+    best_summary_path = output_dir / BEST_MODEL_SUMMARY_FILENAME
+    save_best_model_summary(best_summary, best_summary_path)
+
     log_success("Modelado finalizado correctamente")
+    log_summary_panel(
+        f"Modelo seleccionado [{experiment_suffix}]",
+        {
+            "Dataset": best_row["dataset"],
+            "Modelo": best_row["model"],
+            "Test F1": round(float(best_row["test_f1"]), 4),
+            "Test Recall": round(float(best_row["test_recall"]), 4),
+            "Resumen guardado": best_summary_path,
+        },
+        border_style="green",
+    )
+
     log_summary_panel(
         f"Salidas de modelado [{experiment_suffix}]",
         {
             "Carpeta de salida": output_dir,
             "Comparativa global": comparison_path,
+            "Resumen mejor modelo": best_summary_path,
         },
         border_style="green",
     )

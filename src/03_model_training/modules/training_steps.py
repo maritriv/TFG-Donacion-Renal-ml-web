@@ -278,3 +278,29 @@ def save_comparison_table(rows: list[Dict[str, object]], output_path: Path) -> N
     output_path.parent.mkdir(parents=True, exist_ok=True)
     df = pd.DataFrame(rows)
     df.to_csv(output_path, index=False)
+
+def select_best_model(
+    rows: list[Dict[str, object]],
+    primary_metric: str,
+    secondary_metric: str,
+) -> Dict[str, object]:
+    """Selecciona la mejor fila segun metrica primaria y secundaria."""
+    if not rows:
+        raise ValueError("No hay filas de comparacion para seleccionar el mejor modelo.")
+
+    sorted_rows = sorted(
+        rows,
+        key=lambda row: (
+            float(row.get(primary_metric, 0.0) or 0.0),
+            float(row.get(secondary_metric, 0.0) or 0.0),
+        ),
+        reverse=True,
+    )
+    return sorted_rows[0]
+
+
+def save_best_model_summary(summary: Dict[str, object], output_path: Path) -> None:
+    """Guarda el resumen del mejor modelo seleccionado."""
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("w", encoding="utf-8") as f:
+        json.dump(summary, f, indent=2, ensure_ascii=False)

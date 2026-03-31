@@ -2,8 +2,8 @@
   "best_params": {
     "max_depth": null,
     "min_samples_leaf": 4,
-    "n_estimators": 300
+    "n_estimators": 100
   },
-  "best_cv_score": 0.6706349206349207,
+  "best_cv_score": 0.5936507936507935,
   "primary_scoring": "f1"
 }
