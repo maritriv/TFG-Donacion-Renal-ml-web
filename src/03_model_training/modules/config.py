@@ -16,9 +16,9 @@ TRANSFER_SYNTH_FILENAME = "dataset_transfer_synthetic.csv"
 TARGET_COLUMN = "DONANTE_VALIDO"
 
 # Parametros de entrenamiento
-RANDOM_STATE = 1
+RANDOM_STATES = [1, 42, 123, 999]
 TEST_SIZE = 0.20
-CV_N_SPLITS = 5
+CV_N_SPLITS = 10
 
 # Experimentos
 RUN_REAL_EXPERIMENT = True
@@ -65,9 +65,6 @@ PARAM_GRIDS = {
 USE_VOTING_ENSEMBLE = True
 VOTING_MODEL_NAME = "voting_tuned"
 
-# Regla de selección del mejor modelo
-SELECTION_PRIMARY_METRIC = "test_f1"
-SELECTION_SECONDARY_METRIC = "test_recall"
-
-# Nombre del resumen final de selección
-BEST_MODEL_SUMMARY_FILENAME = "best_model_summary.json"
+# Resumenes finales por dataset
+BEST_MID_SUMMARY_FILENAME = "best_mid_summary.json"
+BEST_TRANSFER_SUMMARY_FILENAME = "best_transfer_summary.json"

@@ -86,8 +86,8 @@
           "1": 0.37142857142857144
         },
         "synthetic": {
-          "0": 0.6666666666666666,
-          "1": 0.3333333333333333
+          "0": 0.5666666666666667,
+          "1": 0.43333333333333335
         }
       },
       "numeric_summary": {
@@ -99,13 +99,13 @@
           "real_q25": 43.25,
           "real_q50": 49.0,
           "real_q75": 52.0,
-          "synthetic_mean": 47.666666666666664,
-          "synthetic_std": 13.692014620493804,
+          "synthetic_mean": 43.5,
+          "synthetic_std": 14.440723069106363,
           "synthetic_min": 18.0,
           "synthetic_max": 63.0,
-          "synthetic_q25": 41.25,
-          "synthetic_q50": 50.5,
-          "synthetic_q75": 58.0
+          "synthetic_q25": 37.25,
+          "synthetic_q50": 44.5,
+          "synthetic_q75": 54.75
         },
         "IMC": {
           "real_mean": 27.401616220020742,
@@ -115,13 +115,13 @@
           "real_q25": 24.72743013283554,
           "real_q50": 27.548209366391188,
           "real_q75": 29.387755102040817,
-          "synthetic_mean": 25.059927002368696,
-          "synthetic_std": 4.487101358923262,
+          "synthetic_mean": 30.34810779444251,
+          "synthetic_std": 4.673819157499703,
           "synthetic_min": 20.06920415224914,
-          "synthetic_max": 35.68586016079061,
-          "synthetic_q25": 20.77780582166387,
-          "synthetic_q50": 24.36739017173063,
-          "synthetic_q75": 28.07208561923417
+          "synthetic_max": 37.17578426606422,
+          "synthetic_q25": 27.553115766345545,
+          "synthetic_q50": 30.83114117777331,
+          "synthetic_q75": 34.066915523884674
         },
         "CARDIOCOMPRESION_EXTRAHOSPITALARIA": {
           "real_mean": 0.2,
@@ -147,13 +147,13 @@
           "real_q25": 6.0,
           "real_q50": 8.0,
           "real_q75": 9.0,
-          "synthetic_mean": 6.066666666666666,
-          "synthetic_std": 5.595153896582004,
+          "synthetic_mean": 8.666666666666666,
+          "synthetic_std": 4.894284726955079,
           "synthetic_min": 1.0,
           "synthetic_max": 21.0,
-          "synthetic_q25": 2.0,
-          "synthetic_q50": 4.5,
-          "synthetic_q75": 7.75
+          "synthetic_q25": 6.0,
+          "synthetic_q50": 8.0,
+          "synthetic_q75": 10.0
         },
         "COLESTEROL": {
           "real_mean": 0.2571428571428571,
@@ -179,13 +179,13 @@
           "real_q25": 18.0,
           "real_q50": 23.5,
           "real_q75": 32.0,
-          "synthetic_mean": 21.96,
-          "synthetic_std": 15.37080977383587,
+          "synthetic_mean": 33.23333333333334,
+          "synthetic_std": 16.644608391480624,
           "synthetic_min": 4.0,
-          "synthetic_max": 63.8,
-          "synthetic_q25": 10.45,
-          "synthetic_q50": 18.5,
-          "synthetic_q75": 31.6
+          "synthetic_max": 63.6,
+          "synthetic_q25": 20.075,
+          "synthetic_q50": 32.95,
+          "synthetic_q75": 48.2
         }
       },
       "categorical_summary": {
@@ -195,8 +195,8 @@
             "1": 0.12857142857142856
           },
           "synthetic_top_freq": {
-            "0": 0.7666666666666667,
-            "1": 0.23333333333333334
+            "0": 0.8,
+            "1": 0.2
           }
         },
         "GRUPO_SANGUINEO": {
@@ -207,10 +207,9 @@
             "3": 0.02857142857142857
           },
           "synthetic_top_freq": {
-            "1": 0.5333333333333333,
-            "0": 0.23333333333333334,
-            "2": 0.2,
-            "3": 0.03333333333333333
+            "1": 0.4,
+            "0": 0.3333333333333333,
+            "2": 0.26666666666666666
           }
         },
         "CAUSA_FALLECIMIENTO_DANC": {
@@ -222,11 +221,11 @@
             "0": 0.05714285714285714
           },
           "synthetic_top_freq": {
-            "2": 0.4,
-            "3": 0.26666666666666666,
-            "6": 0.16666666666666666,
-            "0": 0.06666666666666667,
-            "1": 0.06666666666666667
+            "2": 0.5333333333333333,
+            "6": 0.2,
+            "3": 0.2,
+            "5": 0.03333333333333333,
+            "0": 0.03333333333333333
           }
         },
         "RECUPERACION_ALGUN_MOMENTO": {
@@ -235,8 +234,8 @@
             "1": 0.15714285714285714
           },
           "synthetic_top_freq": {
-            "0": 0.9333333333333333,
-            "1": 0.06666666666666667
+            "0": 0.8666666666666667,
+            "1": 0.13333333333333333
           }
         },
         "DONANTE_VALIDO": {
@@ -245,8 +244,8 @@
             "1": 0.37142857142857144
           },
           "synthetic_top_freq": {
-            "0": 0.6666666666666666,
-            "1": 0.3333333333333333
+            "0": 0.5666666666666667,
+            "1": 0.43333333333333335
           }
         },
         "CAPNOMETRIA_MEDIO_MISSING": {
@@ -255,8 +254,8 @@
             "1": 0.17142857142857143
           },
           "synthetic_top_freq": {
-            "0": 0.8,
-            "1": 0.2
+            "0": 0.7666666666666667,
+            "1": 0.23333333333333334
           }
         },
         "ADRENALINA_N_MISSING": {
@@ -268,7 +267,7 @@
           }
         }
       },
-      "correlation_difference_mean_abs": 0.1413472263572994
+      "correlation_difference_mean_abs": 0.13831587768275183
     }
   },
   "transfer": {
@@ -347,8 +346,8 @@
           "1": 0.37142857142857144
         },
         "synthetic": {
-          "0": 0.6,
-          "1": 0.4
+          "0": 0.7,
+          "1": 0.3
         }
       },
       "numeric_summary": {
@@ -360,13 +359,13 @@
           "real_q25": 43.25,
           "real_q50": 49.0,
           "real_q75": 52.0,
-          "synthetic_mean": 51.43333333333333,
-          "synthetic_std": 11.165474288714922,
-          "synthetic_min": 28.0,
+          "synthetic_mean": 45.36666666666667,
+          "synthetic_std": 11.278552527981452,
+          "synthetic_min": 18.0,
           "synthetic_max": 63.0,
-          "synthetic_q25": 43.0,
-          "synthetic_q50": 54.0,
-          "synthetic_q75": 62.5
+          "synthetic_q25": 37.5,
+          "synthetic_q50": 46.5,
+          "synthetic_q75": 52.75
         },
         "IMC": {
           "real_mean": 27.401616220020742,
@@ -376,13 +375,13 @@
           "real_q25": 24.72743013283554,
           "real_q50": 27.548209366391188,
           "real_q75": 29.387755102040817,
-          "synthetic_mean": 25.38849595675678,
-          "synthetic_std": 4.875520929197655,
-          "synthetic_min": 20.06920415224914,
-          "synthetic_max": 34.845208004536524,
-          "synthetic_q25": 20.096786948571264,
-          "synthetic_q50": 24.089566187103163,
-          "synthetic_q75": 29.104390003703262
+          "synthetic_mean": 29.94927781129473,
+          "synthetic_std": 4.410725215251084,
+          "synthetic_min": 20.9446345045154,
+          "synthetic_max": 37.17578426606422,
+          "synthetic_q25": 26.530389255396074,
+          "synthetic_q50": 29.44745492952208,
+          "synthetic_q75": 33.03781838871872
         },
         "CARDIOCOMPRESION_EXTRAHOSPITALARIA": {
           "real_mean": 0.2,
@@ -408,13 +407,13 @@
           "real_q25": 6.0,
           "real_q50": 8.0,
           "real_q75": 9.0,
-          "synthetic_mean": 12.6,
-          "synthetic_std": 6.305990583673537,
+          "synthetic_mean": 7.2,
+          "synthetic_std": 5.4860324209885905,
           "synthetic_min": 1.0,
           "synthetic_max": 21.0,
-          "synthetic_q25": 8.25,
-          "synthetic_q50": 11.5,
-          "synthetic_q75": 19.0
+          "synthetic_q25": 3.25,
+          "synthetic_q50": 6.0,
+          "synthetic_q75": 10.0
         },
         "COLESTEROL": {
           "real_mean": 0.2571428571428571,
@@ -424,8 +423,8 @@
           "real_q25": 0.0,
           "real_q50": 0.0,
           "real_q75": 0.75,
-          "synthetic_mean": 0.3,
-          "synthetic_std": 0.466091599699399,
+          "synthetic_mean": 0.43333333333333335,
+          "synthetic_std": 0.5040069329937308,
           "synthetic_min": 0.0,
           "synthetic_max": 1.0,
           "synthetic_q25": 0.0,
@@ -440,13 +439,13 @@
           "real_q25": 15.25,
           "real_q50": 22.0,
           "real_q75": 26.0,
-          "synthetic_mean": 12.266666666666667,
-          "synthetic_std": 9.716439440571781,
+          "synthetic_mean": 24.033333333333335,
+          "synthetic_std": 11.19569909210316,
           "synthetic_min": 4.0,
-          "synthetic_max": 35.0,
-          "synthetic_q25": 4.0,
-          "synthetic_q50": 9.0,
-          "synthetic_q75": 18.5
+          "synthetic_max": 46.0,
+          "synthetic_q25": 14.5,
+          "synthetic_q50": 28.0,
+          "synthetic_q75": 31.0
         }
       },
       "categorical_summary": {
@@ -456,8 +455,8 @@
             "1": 0.12857142857142856
           },
           "synthetic_top_freq": {
-            "0": 0.7333333333333333,
-            "1": 0.26666666666666666
+            "0": 0.7666666666666667,
+            "1": 0.23333333333333334
           }
         },
         "GRUPO_SANGUINEO": {
@@ -468,9 +467,10 @@
             "3": 0.02857142857142857
           },
           "synthetic_top_freq": {
-            "1": 0.4,
-            "0": 0.3333333333333333,
-            "2": 0.26666666666666666
+            "1": 0.5666666666666667,
+            "0": 0.26666666666666666,
+            "2": 0.13333333333333333,
+            "3": 0.03333333333333333
           }
         },
         "CAUSA_FALLECIMIENTO_DANC": {
@@ -482,10 +482,10 @@
             "0": 0.05714285714285714
           },
           "synthetic_top_freq": {
-            "3": 0.4,
+            "3": 0.3333333333333333,
             "2": 0.3333333333333333,
-            "6": 0.2,
-            "0": 0.03333333333333333,
+            "6": 0.23333333333333334,
+            "0": 0.06666666666666667,
             "1": 0.03333333333333333
           }
         },
@@ -495,8 +495,8 @@
             "1": 0.15714285714285714
           },
           "synthetic_top_freq": {
-            "0": 0.9,
-            "1": 0.1
+            "0": 0.8333333333333334,
+            "1": 0.16666666666666666
           }
         },
         "DONANTE_VALIDO": {
@@ -505,8 +505,8 @@
             "1": 0.37142857142857144
           },
           "synthetic_top_freq": {
-            "0": 0.6,
-            "1": 0.4
+            "0": 0.7,
+            "1": 0.3
           }
         },
         "CAPNOMETRIA_TRANSFERENCIA_MISSING": {
@@ -515,8 +515,8 @@
             "1": 0.17142857142857143
           },
           "synthetic_top_freq": {
-            "0": 0.8,
-            "1": 0.2
+            "0": 0.7333333333333333,
+            "1": 0.26666666666666666
           }
         },
         "ADRENALINA_N_MISSING": {
@@ -528,7 +528,7 @@
           }
         }
       },
-      "correlation_difference_mean_abs": 0.16207761834039505
+      "correlation_difference_mean_abs": 0.17469225997886803
     }
   }
 }

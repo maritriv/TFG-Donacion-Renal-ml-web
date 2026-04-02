@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.base import clone
+from sklearn.ensemble import VotingClassifier
 from sklearn.metrics import (
     accuracy_score,
     balanced_accuracy_score,
@@ -23,7 +24,7 @@ from sklearn.metrics import (
     roc_auc_score,
 )
 from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
-from sklearn.ensemble import VotingClassifier
+
 
 def load_dataset(csv_path: Path) -> pd.DataFrame:
     """Carga un dataset desde CSV."""
@@ -182,9 +183,9 @@ def train_and_evaluate_model(
 
     return metrics
 
+
 def build_voting_classifier(best_models: Dict[str, object]):
     """Construye un VotingClassifier a partir de modelos ya tuneados."""
-    
     estimators = []
 
     if "logistic_regression" in best_models:
@@ -193,12 +194,16 @@ def build_voting_classifier(best_models: Dict[str, object]):
     if "svm" in best_models:
         estimators.append(("svm", best_models["svm"]))
 
+    if len(estimators) < 2:
+        raise ValueError("No hay suficientes modelos para construir el voting ensemble.")
+
     return VotingClassifier(
         estimators=estimators,
         voting="soft",
         weights=[1, 2],
         n_jobs=1,
     )
+
 
 def save_metrics(metrics: Dict[str, object], output_path: Path) -> None:
     """Guarda métricas en JSON."""
@@ -278,29 +283,3 @@ def save_comparison_table(rows: list[Dict[str, object]], output_path: Path) -> N
     output_path.parent.mkdir(parents=True, exist_ok=True)
     df = pd.DataFrame(rows)
     df.to_csv(output_path, index=False)
-
-def select_best_model(
-    rows: list[Dict[str, object]],
-    primary_metric: str,
-    secondary_metric: str,
-) -> Dict[str, object]:
-    """Selecciona la mejor fila segun metrica primaria y secundaria."""
-    if not rows:
-        raise ValueError("No hay filas de comparacion para seleccionar el mejor modelo.")
-
-    sorted_rows = sorted(
-        rows,
-        key=lambda row: (
-            float(row.get(primary_metric, 0.0) or 0.0),
-            float(row.get(secondary_metric, 0.0) or 0.0),
-        ),
-        reverse=True,
-    )
-    return sorted_rows[0]
-
-
-def save_best_model_summary(summary: Dict[str, object], output_path: Path) -> None:
-    """Guarda el resumen del mejor modelo seleccionado."""
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    with output_path.open("w", encoding="utf-8") as f:
-        json.dump(summary, f, indent=2, ensure_ascii=False)

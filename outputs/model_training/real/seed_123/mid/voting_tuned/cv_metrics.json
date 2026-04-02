@@ -1,0 +1,106 @@
+{
+  "fold_metrics": [
+    {
+      "accuracy": 0.6666666666666666,
+      "balanced_accuracy": 0.75,
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1": 0.6666666666666666,
+      "roc_auc": 0.75,
+      "fold": 1
+    },
+    {
+      "accuracy": 0.8333333333333334,
+      "balanced_accuracy": 0.75,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6666666666666666,
+      "roc_auc": 0.875,
+      "fold": 2
+    },
+    {
+      "accuracy": 0.5,
+      "balanced_accuracy": 0.375,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": 0.625,
+      "fold": 3
+    },
+    {
+      "accuracy": 0.8333333333333334,
+      "balanced_accuracy": 0.75,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6666666666666666,
+      "roc_auc": 1.0,
+      "fold": 4
+    },
+    {
+      "accuracy": 0.3333333333333333,
+      "balanced_accuracy": 0.25,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": 0.5,
+      "fold": 5
+    },
+    {
+      "accuracy": 0.8333333333333334,
+      "balanced_accuracy": 0.8333333333333333,
+      "precision": 1.0,
+      "recall": 0.6666666666666666,
+      "f1": 0.8,
+      "roc_auc": 1.0,
+      "fold": 6
+    },
+    {
+      "accuracy": 0.8,
+      "balanced_accuracy": 0.75,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6666666666666666,
+      "roc_auc": 0.6666666666666667,
+      "fold": 7
+    },
+    {
+      "accuracy": 0.4,
+      "balanced_accuracy": 0.41666666666666663,
+      "precision": 0.3333333333333333,
+      "recall": 0.5,
+      "f1": 0.4,
+      "roc_auc": 0.6666666666666667,
+      "fold": 8
+    },
+    {
+      "accuracy": 0.8,
+      "balanced_accuracy": 0.75,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6666666666666666,
+      "roc_auc": 1.0,
+      "fold": 9
+    },
+    {
+      "accuracy": 0.6,
+      "balanced_accuracy": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": 1.0,
+      "fold": 10
+    }
+  ],
+  "accuracy_mean": 0.66,
+  "accuracy_std": 0.18245242911205348,
+  "balanced_accuracy_mean": 0.6125,
+  "balanced_accuracy_std": 0.19547840176233167,
+  "precision_mean": 0.5833333333333333,
+  "precision_std": 0.4425306015783918,
+  "recall_mean": 0.41666666666666663,
+  "recall_std": 0.30956959368344517,
+  "f1_mean": 0.4533333333333333,
+  "f1_std": 0.310984101058416,
+  "roc_auc_mean": 0.8083333333333333,
+  "roc_auc_std": 0.1798919428743575
+}

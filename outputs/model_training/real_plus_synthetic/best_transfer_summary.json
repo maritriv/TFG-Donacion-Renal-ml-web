@@ -1,0 +1,28 @@
+{
+  "dataset": "transfer",
+  "selected_model_name": "logistic_regression",
+  "selected_experiment": "real_plus_synthetic",
+  "selected_seed": 123,
+  "selected_model_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_training\\real_plus_synthetic\\seed_123\\transfer\\logistic_regression\\best_model.joblib",
+  "selection_criteria": {
+    "primary": "test_f1",
+    "secondary": "test_recall",
+    "tertiary": "cv_f1_mean"
+  },
+  "metrics": {
+    "cv_accuracy_mean": 0.7319444444444445,
+    "cv_balanced_accuracy_mean": 0.7483333333333333,
+    "cv_precision_mean": 0.635,
+    "cv_recall_mean": 0.8,
+    "cv_f1_mean": 0.6899206349206348,
+    "cv_roc_auc_mean": 0.7577777777777779,
+    "test_accuracy": 0.7857142857142857,
+    "test_balanced_accuracy": 0.7444444444444445,
+    "test_precision": 0.75,
+    "test_recall": 0.6,
+    "test_f1": 0.6666666666666666,
+    "test_roc_auc": 0.7777777777777778,
+    "best_cv_score": 0.6899206349206348
+  },
+  "best_params": "{'model__C': 10}"
+}

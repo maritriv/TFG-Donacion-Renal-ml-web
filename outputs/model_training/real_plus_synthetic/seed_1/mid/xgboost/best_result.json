@@ -1,0 +1,13 @@
+{
+  "best_params": {
+    "colsample_bytree": 0.9,
+    "learning_rate": 0.1,
+    "max_depth": 3,
+    "n_estimators": 300,
+    "subsample": 0.9
+  },
+  "best_cv_score": 0.4507142857142858,
+  "primary_scoring": "f1",
+  "seed": 1,
+  "experiment": "real_plus_synthetic"
+}

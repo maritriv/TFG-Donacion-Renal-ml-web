@@ -1,0 +1,11 @@
+{
+  "best_params": {
+    "max_depth": null,
+    "min_samples_leaf": 4,
+    "n_estimators": 500
+  },
+  "best_cv_score": 0.562857142857143,
+  "primary_scoring": "f1",
+  "seed": 123,
+  "experiment": "real_plus_synthetic"
+}

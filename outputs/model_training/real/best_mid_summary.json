@@ -1,0 +1,28 @@
+{
+  "dataset": "mid",
+  "selected_model_name": "logistic_regression",
+  "selected_experiment": "real",
+  "selected_seed": 999,
+  "selected_model_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_training\\real\\seed_999\\mid\\logistic_regression\\best_model.joblib",
+  "selection_criteria": {
+    "primary": "test_f1",
+    "secondary": "test_recall",
+    "tertiary": "cv_f1_mean"
+  },
+  "metrics": {
+    "cv_accuracy_mean": 0.6633333333333333,
+    "cv_balanced_accuracy_mean": 0.6583333333333333,
+    "cv_precision_mean": 0.64,
+    "cv_recall_mean": 0.65,
+    "cv_f1_mean": 0.5961904761904762,
+    "cv_roc_auc_mean": 0.6972222222222222,
+    "test_accuracy": 0.7142857142857143,
+    "test_balanced_accuracy": 0.7333333333333334,
+    "test_precision": 0.5714285714285714,
+    "test_recall": 0.8,
+    "test_f1": 0.6666666666666666,
+    "test_roc_auc": 0.7333333333333334,
+    "best_cv_score": 0.5961904761904762
+  },
+  "best_params": "{'model__C': 1}"
+}

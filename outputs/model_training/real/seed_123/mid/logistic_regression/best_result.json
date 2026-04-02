@@ -1,0 +1,9 @@
+{
+  "best_params": {
+    "model__C": 1
+  },
+  "best_cv_score": 0.6023809523809525,
+  "primary_scoring": "f1",
+  "seed": 123,
+  "experiment": "real"
+}

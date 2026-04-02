@@ -9,12 +9,11 @@ PROCESSED_DIR_RELATIVE_PATH = Path("data/processed")
 MID_CLEAN_FILENAME = "dataset_mid_clean.csv"
 TRANSFER_CLEAN_FILENAME = "dataset_transfer_clean.csv"
 
-BEST_MODEL_SUMMARY_FILENAME = "best_model_summary.json"
+BEST_MID_SUMMARY_FILENAME = "best_mid_summary.json"
+BEST_TRANSFER_SUMMARY_FILENAME = "best_transfer_summary.json"
 
 # Experimento de referencia para evaluacion final
 FINAL_EXPERIMENT_NAME = "real"
 
-# Parametros
-RANDOM_STATE = 1
 TEST_SIZE = 0.20
 TARGET_COLUMN = "DONANTE_VALIDO"

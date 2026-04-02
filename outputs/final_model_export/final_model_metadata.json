@@ -1,9 +1,15 @@
 {
   "selected_experiment": "real",
-  "selected_model_name": "random_forest",
-  "selected_dataset": "mid",
-  "original_model_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_training\\real\\mid\\random_forest\\best_model.joblib",
+  "selected_model_name": "logistic_regression",
+  "selected_dataset": "transfer",
+  "selected_seed": 999,
+  "original_model_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_training\\real\\seed_999\\transfer\\logistic_regression\\best_model.joblib",
+  "dataset_used_for_retraining": "C:\\TFG-Donacion-Renal-ml-web\\data\\processed\\dataset_transfer_clean.csv",
   "exported_model_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\final_model_export\\final_model.joblib",
-  "selection_summary_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_training\\real\\best_model_summary.json",
-  "evaluation_report_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_evaluation\\final_evaluation_report.json"
+  "best_mid_summary_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_training\\real\\best_mid_summary.json",
+  "best_transfer_summary_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_training\\real\\best_transfer_summary.json",
+  "evaluation_report_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_evaluation\\final_comparison_report.json",
+  "retrained_with_full_dataset": true,
+  "n_training_rows_full_dataset": 70,
+  "n_training_columns_full_dataset": 13
 }
