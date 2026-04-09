@@ -1,121 +1,118 @@
-# renal-dcd-ml-web
+# TFG-Donacion-Renal-ml-web
 
-## Descripcion
+Repositorio del **Trabajo de Fin de Grado en Ingeniería de Datos e Inteligencia Artificial** centrado en la **predicción de donantes renales válidos en asistolia no controlada** mediante técnicas de análisis de datos y aprendizaje automático.
 
-Proyecto de **Trabajo de Fin de Grado (TFG)** orientado a la prediccion de viabilidad de donacion renal.  
-En la fase actual se ha implementado la **primera capa del pipeline de datos**, centrada en:
+El proyecto forma parte de un sistema más amplio compuesto por:
 
-- Limpieza y validacion de la hoja `Donante` del Excel clinico
-- Generacion de datasets limpios para dos momentos clinicos (`MID` y `TRANSFERENCIA`)
-- Generacion de datasets sinteticos y reporte comparativo basico
+- una **aplicación móvil**, orientada al uso clínico basado en reglas médicas derivadas de una tesis doctoral,
+- y una **plataforma web**, orientada a la predicción mediante modelos de *machine learning*.
 
----
-### Funcionalidades
+Este repositorio contiene principalmente el **pipeline de datos y modelado**, incluyendo limpieza, análisis exploratorio, entrenamiento, evaluación y exportación del modelo final.
 
 ---
 
-## Estructura general del repositorio
+## Objetivo del repositorio
+
+El objetivo de este repositorio es implementar un flujo reproducible para:
+
+1. cargar y limpiar los datos clínicos proporcionados por el equipo médico,
+2. construir datasets de modelado para distintos momentos clínicos,
+3. realizar análisis exploratorio,
+4. entrenar y comparar distintos modelos de clasificación,
+5. evaluar el rendimiento final,
+6. exportar el modelo seleccionado para su integración posterior en la plataforma web.
+
+---
+
+## Fases del pipeline
+
+El proyecto está organizado en cinco fases principales:
+
+### 1. Limpieza y preparación de datos
+- lectura de la hoja `Donante` del Excel clínico,
+- normalización de nombres de columnas,
+- eliminación de duplicados,
+- limpieza de variables binarias y numéricas,
+- creación de la variable objetivo `DONANTE_VALIDO`,
+- construcción de datasets para dos momentos clínicos:
+  - `MID`
+  - `TRANSFER`
+
+### 2. Análisis exploratorio
+- estudio descriptivo de variables,
+- distribución de la variable objetivo,
+- histogramas,
+- matrices de correlación,
+- generación de reportes automáticos.
+
+### 3. Entrenamiento de modelos
+Comparación de varios modelos de clasificación, entre ellos:
+- Dummy Classifier
+- Logistic Regression
+- Random Forest
+- SVM
+- XGBoost
+- Voting Classifier
+
+Se contemplan dos escenarios experimentales:
+- entrenamiento con **datos reales**,
+- entrenamiento con **datos reales + sintéticos**.
+
+### 4. Evaluación final
+- selección de modelos candidatos,
+- evaluación sobre conjunto de prueba,
+- generación de métricas,
+- matrices de confusión,
+- comparación final entre configuraciones.
+
+### 5. Exportación del modelo final
+- selección del mejor candidato global,
+- reentrenamiento con todos los datos disponibles,
+- exportación del modelo final en formato `joblib`,
+- guardado de metadatos y métricas finales.
+
+---
+
+## Estructura del repositorio
+
 ```text
 TFG-Donacion-Renal-ml-web/
-|-- .gitignore
-|-- pyproject.toml
-|-- README.md
-|-- uv.lock
-|-- data/
-|   |-- external/
-|   |   `-- .gitkeep
-|   |-- processed/
-|   |   |-- .gitkeep
-|   |   |-- cleaning_report.json
-|   |   |-- dataset_mid_clean.csv
-|   |   |-- dataset_mid_synthetic.csv
-|   |   |-- dataset_transfer_clean.csv
-|   |   |-- dataset_transfer_synthetic.csv
-|   |   `-- synthetic_report.json
-|   `-- raw/
-|       |-- .gitkeep
-|       `-- dataset_medicos.xlsx
-|-- docs/
-|   |-- .gitkeep
-|   |-- pipeline_overview.md
-|   `-- README.md
-|-- src/
-|   |-- 01_data_cleaning/
-|   |   |-- clean_data.py
-|   |   |-- generate_synthetic_data.py
-|   |   |-- main.py
-|   |   |-- __init__.py
-|   |   `-- modules/
-|   |       |-- cleaning_pipeline.py
-|   |       |-- cleaning_steps.py
-|   |       |-- config.py
-|   |       |-- synthetic_pipeline.py
-|   |       |-- synthetic_steps.py
-|   |       |-- visual_logger.py
-|   |       `-- __init__.py
-|   |-- 02_exploratory_analysis
-|   |   `-- __init__.py
-|   |-- 03_model_training/
-|   |   `-- __init__.py
-|   |-- 04_model_evaluation/
-|   |   `-- train.py
-|   `-- 05_final_model_export/
-|       `-- __init__.py
-|-- tests/
-|   `-- .gitkeep
-|-- web/
-|   |-- backend/
-|   |   `-- .gitkeep
-|   `-- frontend/
-|       `-- .gitkeep
+├── data/
+│   ├── raw/                  # Datos originales
+│   ├── processed/            # Datasets limpios, sintéticos y reportes
+│   └── external/             # Datos externos complementarios
+├── docs/                     # Documentación técnica complementaria
+├── outputs/
+│   ├── exploratory_analysis/ # Gráficas y reportes del EDA
+│   ├── model_training/       # Resultados de entrenamiento
+│   ├── model_evaluation/     # Evaluación final
+│   └── final_model_export/   # Modelo final exportado
+├── src/
+│   ├── 01_data_cleaning/
+│   ├── 02_exploratory_analysis/
+│   ├── 03_model_training/
+│   ├── 04_model_evaluation/
+│   ├── 05_final_model_export/
+│   ├── common/
+│   └── main.py               # Orquestador global del pipeline
+├── tests/
+├── web/
+│   ├── backend/
+│   └── frontend/
+├── pyproject.toml
+├── uv.lock
+└── README.md
 ```
 
 ---
 
-## Indice
-Detalles de subdirectorios y archivos principales existentes:
-
-- Directorio __`src/`__: Codigo fuente del proyecto.
-    - Directorio __`01_data_cleaning/`__: Implementacion de la fase actual del pipeline.
-        - Archivo `main.py`: Orquesta el flujo completo (limpieza y sintesis) en un unico comando.
-        - Archivo `clean_data.py`: Ejecuta unicamente la etapa de limpieza de datos.
-        - Archivo `generate_synthetic_data.py`: Ejecuta unicamente la etapa de generacion sintetica.
-        - Directorio __`modules/`__: Modulos internos reutilizables de la fase.
-            - Archivo `config.py`: Centraliza umbrales, rutas, nombres de salida y listas de columnas.
-            - Archivo `visual_logger.py`: Implementa logs visuales con banners y pasos numerados.
-            - Archivo `cleaning_steps.py`: Contiene funciones atomicas de limpieza y validacion.
-            - Archivo `cleaning_pipeline.py`: Define y ejecuta la secuencia completa de limpieza.
-            - Archivo `synthetic_steps.py`: Contiene funciones de sintesis y validacion estadistica basica.
-            - Archivo `synthetic_pipeline.py`: Define y ejecuta la secuencia completa de sintesis.
-    - Directorio __`03_model_training/`__: Espacio base para la etapa de entrenamiento.
-    - Directorio __`04_model_evaluation/`__: Incluye `train.py` para pruebas de entrenamiento/evaluacion.
-    - Directorio __`05_final_model_export/`__: Espacio reservado para exportacion del modelo final.
-
-- Directorio __`data/`__: Datos de entrada y salidas del pipeline.
-    - Directorio `raw/`: Datos originales (incluye `dataset_medicos.xlsx`).
-    - Directorio `processed/`: Salidas generadas por el pipeline.
-        - Archivo `dataset_mid_clean.csv`: Dataset limpio para el momento clinico medio.
-        - Archivo `dataset_transfer_clean.csv`: Dataset limpio para el momento clinico de transferencia.
-        - Archivo `dataset_mid_synthetic.csv`: Dataset sintetico generado a partir de `dataset_mid_clean.csv`.
-        - Archivo `dataset_transfer_synthetic.csv`: Dataset sintetico generado a partir de `dataset_transfer_clean.csv`.
-        - Archivo `cleaning_report.json`: Informe estructurado de trazabilidad de la limpieza.
-        - Archivo `synthetic_report.json`: Informe estructurado de validacion basica real vs sintetico.
-    - Directorio `external/`: Espacio reservado para datos externos complementarios.
-
-- Directorio __`docs/`__: Documentacion tecnica complementaria.
-    - Archivo `pipeline_overview.md`: Resumen del funcionamiento del pipeline.
-    - Archivo `README.md`: Nota de entrada a la documentacion del directorio.
-
-- Directorio __`tests/`__: Carpeta de pruebas (actualmente mantenida con `.gitkeep`).
-- Directorio __`web/`__: Estructura inicial de aplicacion (`backend/` y `frontend/`, ambas con `.gitkeep`).
-
-- Archivo __`pyproject.toml`__: Define metadatos del proyecto y dependencias con `uv`.
-- Archivo __`uv.lock`__: Congela versiones de dependencias para reproducibilidad.
-- Archivo __`.gitignore`__: Evita subir artefactos temporales o de entorno.
+## Requisitos
+- Python 3.11 o superior
+- [uv](https://github.com/astral-sh/uv) para la gestión del entorno y dependencias
 
 ---
 
-## Instalacion del entorno
+## Instalación del entorno
 
 **1.** Clonar el repositorio:
 
@@ -130,49 +127,185 @@ cd TFG-Donacion-Renal-ml-web
 pip install uv
 ```
 
-**3.** Instalar dependencias:
+**3.** Instalar dependencias base:
 
 ```bash
 uv sync
 ```
 
-**4.** Instalar dependenciaS de sintesis avanzada (CTGAN):
+**4.** Instalar dependenciaS opcionales para datos sintéticos:
 
 ```bash
 uv sync --extra synthetic
 ```
+--- 
 
-**5.** Ejecutar pipelines:
+## Ejecución
+
+**Ejecutar el pipeline completo:**
 
 ```bash
-# Pipeline completo (limpieza + sintetico)
+uv run -m src.main
+```
+
+**Ejecutar solo la fase de limpieza y generación de datos sintéticos**
+```bashe
 uv run -m src.01_data_cleaning.main
+```
 
-# Solo limpieza
+**Ejecutar solo limpieza**
+```bashe
 uv run -m src.01_data_cleaning.clean_data
+```
 
-# Solo sintetico
+**Ejecutar solo generación sintética**
+```bashe
 uv run -m src.01_data_cleaning.generate_synthetic_data
 ```
 
-**Outputs generados:**
-En data/processed/ se generan:
-- dataset_mid_clean.csv
-- dataset_transfer_clean.csv
-- cleaning_report.json
-- dataset_mid_synthetic.csv
-- dataset_transfer_synthetic.csv
-- synthetic_report.json
+**Ejecutar solo análisis exploratorio**
+```bashe
+uv run -m src.02_exploratory_analysis.main
+```
+
+**Ejecutar solo entrenamiento**
+```bashe
+uv run -m src.03_model_training.main
+```
+
+**Ejecutar solo evaluación final**
+```bashe
+uv run -m src.04_model_evaluation.main
+```
+
+**Ejecutar solo exportación final**
+```bashe
+uv run -m src.05_final_model_export.main
+```
+---
+
+## Datos de entrada
+
+La entrada principal del pipeline es el archivo:
+```bash
+data/raw/dataset_medicos.xlsx
+````
+
+Actualmente se utiliza la hoja **Donante**.
 
 ---
 
-## Equipo de desarrollo
+## Salidas principales
 
-- Marina Trivino de las Heras
+### Datos procesados
+
+En `data/processed/` se generan, entre otros:
+
+- `dataset_mid_clean.csv`
+- `dataset_transfer_clean.csv`
+- `cleaning_report.json`
+- `dataset_mid_synthetic.csv`
+- `dataset_transfer_synthetic.csv`
+- `synthetic_report.json`
 
 ---
 
-## Recursos adicionales
+### Análisis exploratorio
 
-- [Memoria]()
-- [Repositorio a aplicacion movil](https://github.com/maritriv/TFG-Donacion-Renal)
+En `outputs/exploratory_analysis/` se generan:
+
+- histogramas de variables relevantes,
+- distribuciones de la variable objetivo,
+- mapas de correlación,
+- `eda_report.json`.
+
+---
+
+### Entrenamiento y evaluación
+
+En `outputs/model_training/` y `outputs/model_evaluation/` se generan:
+
+- métricas por modelo,
+- resultados de validación cruzada,
+- matrices de confusión,
+- comparativas entre modelos,
+- predicciones sobre test.
+
+---
+
+### Modelo final
+
+En `outputs/final_model_export/` se exportan:
+
+- `final_model.joblib`
+- `final_model_metadata.json`
+- `final_metrics.json`
+
+---
+
+## Resultado final actual
+
+De acuerdo con la última ejecución almacenada en el repositorio, el modelo final exportado corresponde a:
+
+- **dataset seleccionado:** `transfer`
+- **modelo seleccionado:** `xgboost`
+- **experimento:** `real_plus_synthetic`
+- **métrica principal de selección:** `F1-score`
+- **recall en evaluación final:** `0.8`
+- **F1-score en evaluación final:** `0.8`
+
+> Estos resultados deben interpretarse dentro del contexto del tamaño muestral disponible y del carácter académico-experimental del proyecto.
+
+---
+
+## Estado del proyecto
+
+Estado actual del repositorio:
+
+- [x] limpieza y preparación de datos  
+- [x] generación de datasets de modelado  
+- [x] análisis exploratorio  
+- [x] entrenamiento y comparación de modelos  
+- [x] evaluación final  
+- [x] exportación del modelo final  
+- [ ] integración completa con la aplicación web  
+- [ ] batería de tests automatizados  
+- [ ] despliegue final del backend y frontend  
+
+---
+
+## Tecnologías utilizadas
+
+- Python  
+- pandas  
+- numpy  
+- scikit-learn  
+- xgboost  
+- matplotlib  
+- openpyxl  
+- rich  
+- sdv / CTGAN (para generación sintética)  
+- joblib  
+
+---
+
+## Consideraciones
+
+- Este repositorio forma parte de un TFG con aplicación en un contexto clínico real.  
+- Los modelos desarrollados tienen fines académicos y de apoyo a la decisión, no sustituyen la valoración médica.  
+- La validez de los resultados depende del tamaño, calidad y representatividad del dataset proporcionado.  
+
+---
+
+## Autora
+
+**Marina Triviño de las Heras**
+
+Grado en Ingeniería de Datos e Inteligencia Artificial  
+Universidad Complutense de Madrid  
+
+---
+
+## Repositorios relacionados
+
+- Aplicación móvil: [TFG-Donacion-Renal](https://github.com/maritriv/TFG-Donacion-Renal)
