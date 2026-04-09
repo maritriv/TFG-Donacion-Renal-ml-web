@@ -283,3 +283,23 @@ def save_comparison_table(rows: list[Dict[str, object]], output_path: Path) -> N
     output_path.parent.mkdir(parents=True, exist_ok=True)
     df = pd.DataFrame(rows)
     df.to_csv(output_path, index=False)
+
+def save_feature_importance(model, feature_names, output_path: Path) -> None:
+    """Guarda la importancia de variables si el modelo la soporta."""
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    fitted_model = model
+    if hasattr(model, "named_steps") and "model" in model.named_steps:
+        fitted_model = model.named_steps["model"]
+
+    if not hasattr(fitted_model, "feature_importances_"):
+        return
+
+    importance_df = pd.DataFrame(
+        {
+            "feature": list(feature_names),
+            "importance": fitted_model.feature_importances_,
+        }
+    ).sort_values(by="importance", ascending=False)
+
+    importance_df.to_csv(output_path, index=False)

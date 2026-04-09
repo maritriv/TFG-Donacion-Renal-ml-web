@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
@@ -19,6 +20,8 @@ from .config import (
     PRIMARY_SCORING,
     PROCESSED_DIR_RELATIVE_PATH,
     RANDOM_STATES,
+    RUN_CONFIG_FILENAME,
+    SEED_AGGREGATED_SUMMARY_FILENAME,
     TARGET_COLUMN,
     TEST_SIZE,
     TRANSFER_CLEAN_FILENAME,
@@ -26,7 +29,6 @@ from .config import (
     TUNED_MODEL_NAMES,
     USE_VOTING_ENSEMBLE,
     VOTING_MODEL_NAME,
-    SEED_AGGREGATED_SUMMARY_FILENAME,
 )
 from .model_factory import get_model
 from .training_steps import (
@@ -37,6 +39,7 @@ from .training_steps import (
     make_train_test_split,
     save_comparison_table,
     save_confusion_matrix_plot,
+    save_feature_importance,
     save_grid_search_results,
     save_metrics,
     save_model,
@@ -59,10 +62,16 @@ def project_root() -> Path:
     return Path(__file__).resolve().parents[3]
 
 
+def _relative_to_project(path: Path, root: Path) -> str:
+    """Convierte una ruta absoluta en relativa a la raíz del proyecto."""
+    return str(path.relative_to(root))
+
+
 def _build_best_summary(
     df: pd.DataFrame,
     dataset_name: str,
     base_output_dir: Path,
+    root: Path,
 ) -> dict:
     """Selecciona la mejor estrategia para un dataset concreto."""
     subset = df[df["dataset"] == dataset_name].copy()
@@ -89,26 +98,52 @@ def _build_best_summary(
         "selected_model_name": str(best_row["model"]),
         "selected_experiment": str(best_row["experiment"]),
         "selected_seed": int(best_row["seed"]),
-        "selected_model_path": str(model_path),
+        "selected_model_path": _relative_to_project(model_path, root),
         "selection_criteria": {
             "primary": "test_f1",
             "secondary": "test_recall",
             "tertiary": "cv_f1_mean",
         },
         "metrics": {
-            "cv_accuracy_mean": float(best_row["cv_accuracy_mean"]) if pd.notna(best_row["cv_accuracy_mean"]) else None,
-            "cv_balanced_accuracy_mean": float(best_row["cv_balanced_accuracy_mean"]) if pd.notna(best_row["cv_balanced_accuracy_mean"]) else None,
-            "cv_precision_mean": float(best_row["cv_precision_mean"]) if pd.notna(best_row["cv_precision_mean"]) else None,
-            "cv_recall_mean": float(best_row["cv_recall_mean"]) if pd.notna(best_row["cv_recall_mean"]) else None,
-            "cv_f1_mean": float(best_row["cv_f1_mean"]) if pd.notna(best_row["cv_f1_mean"]) else None,
-            "cv_roc_auc_mean": float(best_row["cv_roc_auc_mean"]) if pd.notna(best_row["cv_roc_auc_mean"]) else None,
-            "test_accuracy": float(best_row["test_accuracy"]) if pd.notna(best_row["test_accuracy"]) else None,
-            "test_balanced_accuracy": float(best_row["test_balanced_accuracy"]) if pd.notna(best_row["test_balanced_accuracy"]) else None,
-            "test_precision": float(best_row["test_precision"]) if pd.notna(best_row["test_precision"]) else None,
-            "test_recall": float(best_row["test_recall"]) if pd.notna(best_row["test_recall"]) else None,
-            "test_f1": float(best_row["test_f1"]) if pd.notna(best_row["test_f1"]) else None,
-            "test_roc_auc": float(best_row["test_roc_auc"]) if pd.notna(best_row["test_roc_auc"]) else None,
-            "best_cv_score": float(best_row["best_cv_score"]) if pd.notna(best_row["best_cv_score"]) else None,
+            "cv_accuracy_mean": float(best_row["cv_accuracy_mean"])
+            if pd.notna(best_row["cv_accuracy_mean"])
+            else None,
+            "cv_balanced_accuracy_mean": float(best_row["cv_balanced_accuracy_mean"])
+            if pd.notna(best_row["cv_balanced_accuracy_mean"])
+            else None,
+            "cv_precision_mean": float(best_row["cv_precision_mean"])
+            if pd.notna(best_row["cv_precision_mean"])
+            else None,
+            "cv_recall_mean": float(best_row["cv_recall_mean"])
+            if pd.notna(best_row["cv_recall_mean"])
+            else None,
+            "cv_f1_mean": float(best_row["cv_f1_mean"])
+            if pd.notna(best_row["cv_f1_mean"])
+            else None,
+            "cv_roc_auc_mean": float(best_row["cv_roc_auc_mean"])
+            if pd.notna(best_row["cv_roc_auc_mean"])
+            else None,
+            "test_accuracy": float(best_row["test_accuracy"])
+            if pd.notna(best_row["test_accuracy"])
+            else None,
+            "test_balanced_accuracy": float(best_row["test_balanced_accuracy"])
+            if pd.notna(best_row["test_balanced_accuracy"])
+            else None,
+            "test_precision": float(best_row["test_precision"])
+            if pd.notna(best_row["test_precision"])
+            else None,
+            "test_recall": float(best_row["test_recall"])
+            if pd.notna(best_row["test_recall"])
+            else None,
+            "test_f1": float(best_row["test_f1"])
+            if pd.notna(best_row["test_f1"])
+            else None,
+            "test_roc_auc": float(best_row["test_roc_auc"])
+            if pd.notna(best_row["test_roc_auc"])
+            else None,
+            "best_cv_score": float(best_row["best_cv_score"])
+            if pd.notna(best_row["best_cv_score"])
+            else None,
         },
         "best_params": best_row["best_params"],
     }
@@ -178,6 +213,24 @@ def run_training_pipeline(logger, use_synthetic: bool = False) -> None:
     base_output_dir = root / MODEL_OUTPUT_DIR_RELATIVE_PATH
     experiment_suffix = "real" if not use_synthetic else "real_plus_synthetic"
     experiment_output_dir = base_output_dir / experiment_suffix
+
+    run_config = {
+        "timestamp": datetime.now().isoformat(),
+        "experiment": experiment_suffix,
+        "use_synthetic": use_synthetic,
+        "random_states": RANDOM_STATES,
+        "test_size": TEST_SIZE,
+        "cv_n_splits": CV_N_SPLITS,
+        "primary_scoring": PRIMARY_SCORING,
+        "target_column": TARGET_COLUMN,
+        "datasets": ["mid", "transfer"],
+        "baseline_model": BASELINE_MODEL_NAME,
+        "tuned_models": TUNED_MODEL_NAMES,
+        "use_voting_ensemble": USE_VOTING_ENSEMBLE,
+        "voting_model_name": VOTING_MODEL_NAME,
+    }
+
+    _save_json(run_config, experiment_output_dir / RUN_CONFIG_FILENAME)
 
     mid_path = processed_dir / MID_CLEAN_FILENAME
     transfer_path = processed_dir / TRANSFER_CLEAN_FILENAME
@@ -354,6 +407,11 @@ def run_training_pipeline(logger, use_synthetic: bool = False) -> None:
                 save_metrics(tuned_test_metrics, model_output_dir / "test_metrics.json")
                 save_grid_search_results(search, model_output_dir / "grid_search_results.csv")
                 save_model(best_model, model_output_dir / "best_model.joblib")
+                save_feature_importance(
+                    model=best_model,
+                    feature_names=list(x_train.columns),
+                    output_path=model_output_dir / "feature_importance.csv",
+                )
                 save_confusion_matrix_plot(
                     confusion_matrix_values=tuned_test_metrics["confusion_matrix"],
                     output_path=model_output_dir / "confusion_matrix.png",
@@ -452,15 +510,17 @@ def run_training_pipeline(logger, use_synthetic: bool = False) -> None:
 
     preview_rows = []
     for _, row in comparison_df.iterrows():
-        preview_rows.append([
-            row["seed"],
-            row["experiment"],
-            row["dataset"],
-            row["model"],
-            row["best_cv_score"] if pd.notna(row["best_cv_score"]) else row["cv_f1_mean"],
-            row["test_f1"],
-            row["test_recall"],
-        ])
+        preview_rows.append(
+            [
+                row["seed"],
+                row["experiment"],
+                row["dataset"],
+                row["model"],
+                row["best_cv_score"] if pd.notna(row["best_cv_score"]) else row["cv_f1_mean"],
+                row["test_f1"],
+                row["test_recall"],
+            ]
+        )
 
     log_table(
         title=f"Resumen comparativo de modelos [{experiment_suffix}]",
@@ -471,17 +531,19 @@ def run_training_pipeline(logger, use_synthetic: bool = False) -> None:
 
     aggregated_preview_rows = []
     for _, row in aggregated_df.iterrows():
-        aggregated_preview_rows.append([
-            row["dataset"],
-            row["model"],
-            row["n_seeds"],
-            round(float(row["test_f1_mean"]), 4),
-            round(float(row["test_f1_std"]), 4),
-            round(float(row["test_recall_mean"]), 4),
-            round(float(row["test_recall_std"]), 4),
-            round(float(row["cv_f1_mean_mean"]), 4),
-            round(float(row["cv_f1_mean_std"]), 4),
-        ])
+        aggregated_preview_rows.append(
+            [
+                row["dataset"],
+                row["model"],
+                row["n_seeds"],
+                round(float(row["test_f1_mean"]), 4),
+                round(float(row["test_f1_std"]), 4),
+                round(float(row["test_recall_mean"]), 4),
+                round(float(row["test_recall_std"]), 4),
+                round(float(row["cv_f1_mean_mean"]), 4),
+                round(float(row["cv_f1_mean_std"]), 4),
+            ]
+        )
 
     log_table(
         title=f"Resumen agregado entre seeds [{experiment_suffix}]",
@@ -504,11 +566,13 @@ def run_training_pipeline(logger, use_synthetic: bool = False) -> None:
         df=comparison_df,
         dataset_name="mid",
         base_output_dir=base_output_dir,
+        root=root,
     )
     best_transfer_summary = _build_best_summary(
         df=comparison_df,
         dataset_name="transfer",
         base_output_dir=base_output_dir,
+        root=root,
     )
 
     best_mid_path = experiment_output_dir / BEST_MID_SUMMARY_FILENAME

@@ -1,0 +1,28 @@
+{
+  "timestamp": "2026-04-09T11:00:58.300508",
+  "experiment": "real",
+  "use_synthetic": false,
+  "random_states": [
+    1,
+    42,
+    123,
+    999
+  ],
+  "test_size": 0.2,
+  "cv_n_splits": 10,
+  "primary_scoring": "f1",
+  "target_column": "DONANTE_VALIDO",
+  "datasets": [
+    "mid",
+    "transfer"
+  ],
+  "baseline_model": "dummy",
+  "tuned_models": [
+    "logistic_regression",
+    "random_forest",
+    "svm",
+    "xgboost"
+  ],
+  "use_voting_ensemble": true,
+  "voting_model_name": "voting_tuned"
+}

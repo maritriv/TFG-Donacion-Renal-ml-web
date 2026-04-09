@@ -32,17 +32,18 @@ warnings.filterwarnings(
 
 try:
     from .modules.synthetic_pipeline import run_synthetic_pipeline
-    from src.common.visual_logger import configure_visual_logger, log_banner
+    from src.common.visual_logger import (
+        configure_visual_logger,
+        log_banner,
+        log_success,
+    )
 except ImportError:
     from modules.synthetic_pipeline import run_synthetic_pipeline
-    from src.common.visual_logger import configure_visual_logger, log_banner
-
-try:
-    from .modules.synthetic_pipeline import run_synthetic_pipeline
-    from src.common.visual_logger import configure_visual_logger, log_banner, log_success
-except ImportError:
-    from modules.synthetic_pipeline import run_synthetic_pipeline
-    from src.common.visual_logger import configure_visual_logger, log_banner, log_success
+    from src.common.visual_logger import (
+        configure_visual_logger,
+        log_banner,
+        log_success,
+    )
 
 
 def main() -> None:

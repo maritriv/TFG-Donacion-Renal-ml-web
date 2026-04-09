@@ -3,7 +3,7 @@
   "selected_model_name": "xgboost",
   "selected_experiment": "real_plus_synthetic",
   "selected_seed": 1,
-  "selected_model_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_training\\real_plus_synthetic\\seed_1\\transfer\\xgboost\\best_model.joblib",
+  "selected_model_path": "outputs\\model_training\\real_plus_synthetic\\seed_1\\transfer\\xgboost\\best_model.joblib",
   "selection_criteria": {
     "primary": "test_f1",
     "secondary": "test_recall",

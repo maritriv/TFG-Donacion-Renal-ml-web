@@ -1,27 +1,98 @@
 # Pipeline overview
 
-El pipeline se divide en tres etapas:
+El pipeline del proyecto está organizado en cinco fases principales:
 
-1. Limpieza (`src/limpieza`)
-2. Analisis (`src/analisis`)
-3. Modelado (`src/modelado`)
+1. `src/01_data_cleaning`
+2. `src/02_exploratory_analysis`
+3. `src/03_model_training`
+4. `src/04_model_evaluation`
+5. `src/05_final_model_export`
 
-La orquestacion vive en `src/pipeline/run.py`.
+La orquestación global se realiza desde:
 
-## Entradas y salidas
+- `src/main.py`
 
-- Entrada principal:
-  - `data/raw/dataset_medicos.xlsx`
-- Salidas de limpieza:
-  - `data/processed/dataset_limpio.csv`
-- Salidas de analisis:
-  - `models/metrics/analysis_report.json`
-- Salidas de modelado:
-  - `models/trained/baseline_model.json`
-  - `models/metrics/training_metrics.json`
+## Flujo general
 
-## Comando
+```text
+data/raw/dataset_medicos.xlsx
+        ↓
+01_data_cleaning
+        ↓
+data/processed/
+        ↓
+02_exploratory_analysis
+        ↓
+outputs/exploratory_analysis/
+        ↓
+03_model_training
+        ↓
+outputs/model_training/
+        ↓
+04_model_evaluation
+        ↓
+outputs/model_evaluation/
+        ↓
+05_final_model_export
+        ↓
+outputs/final_model_export/
+
+## Entradas principales
+
+- `data/raw/dataset_medicos.xlsx`
+
+---
+
+## Salidas principales
+
+### Fase 01 · Limpieza y datos sintéticos
+
+- `data/processed/dataset_mid_clean.csv`
+- `data/processed/dataset_transfer_clean.csv`
+- `data/processed/cleaning_report.json`
+- `data/processed/dataset_mid_synthetic.csv`
+- `data/processed/dataset_transfer_synthetic.csv`
+- `data/processed/synthetic_report.json`
+
+---
+
+### Fase 02 · Análisis exploratorio
+
+- `outputs/exploratory_analysis/eda_report.json`
+- histogramas
+- mapas de correlación
+- distribuciones de la variable objetivo
+
+---
+
+### Fase 03 · Entrenamiento
+
+- `outputs/model_training/.../cv_metrics.json`
+- `outputs/model_training/.../test_metrics.json`
+- `outputs/model_training/.../grid_search_results.csv`
+- `outputs/model_training/.../best_model.joblib`
+
+---
+
+### Fase 04 · Evaluación final
+
+- `outputs/model_evaluation/final_comparison_report.json`
+- `outputs/model_evaluation/final_evaluation_report.json`
+- `outputs/model_evaluation/final_metrics.json`
+
+---
+
+### Fase 05 · Exportación final
+
+- `outputs/final_model_export/final_model.joblib`
+- `outputs/final_model_export/final_model_metadata.json`
+- `outputs/final_model_export/final_metrics.json`
+
+---
+
+## Ejecución
+
+### Pipeline completo
 
 ```bash
-python -m pipeline.run --input data/raw/dataset_medicos.xlsx
-```
+uv run -m src.main
