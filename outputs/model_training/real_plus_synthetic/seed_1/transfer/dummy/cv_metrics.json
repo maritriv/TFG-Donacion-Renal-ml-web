@@ -55,7 +55,7 @@
       "fold": 6
     },
     {
-      "accuracy": 0.625,
+      "accuracy": 0.75,
       "balanced_accuracy": 0.5,
       "precision": 0.0,
       "recall": 0.0,
@@ -91,8 +91,8 @@
       "fold": 10
     }
   ],
-  "accuracy_mean": 0.65,
-  "accuracy_std": 0.02041241452319313,
+  "accuracy_mean": 0.6625,
+  "accuracy_std": 0.03461093276215864,
   "balanced_accuracy_mean": 0.5,
   "balanced_accuracy_std": 0.0,
   "precision_mean": 0.0,

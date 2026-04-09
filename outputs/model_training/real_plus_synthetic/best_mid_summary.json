@@ -1,28 +1,28 @@
 {
   "dataset": "mid",
-  "selected_model_name": "random_forest",
+  "selected_model_name": "xgboost",
   "selected_experiment": "real_plus_synthetic",
-  "selected_seed": 1,
-  "selected_model_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_training\\real_plus_synthetic\\seed_1\\mid\\random_forest\\best_model.joblib",
+  "selected_seed": 999,
+  "selected_model_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_training\\real_plus_synthetic\\seed_999\\mid\\xgboost\\best_model.joblib",
   "selection_criteria": {
     "primary": "test_f1",
     "secondary": "test_recall",
     "tertiary": "cv_f1_mean"
   },
   "metrics": {
-    "cv_accuracy_mean": 0.5180555555555555,
-    "cv_balanced_accuracy_mean": 0.515,
-    "cv_precision_mean": 0.4066666666666666,
-    "cv_recall_mean": 0.4666666666666666,
-    "cv_f1_mean": 0.40753968253968254,
-    "cv_roc_auc_mean": 0.5366666666666666,
-    "test_accuracy": 0.8571428571428571,
-    "test_balanced_accuracy": 0.8444444444444444,
-    "test_precision": 0.8,
+    "cv_accuracy_mean": 0.5694444444444444,
+    "cv_balanced_accuracy_mean": 0.5616666666666666,
+    "cv_precision_mean": 0.4866666666666667,
+    "cv_recall_mean": 0.4833333333333334,
+    "cv_f1_mean": 0.45690476190476187,
+    "cv_roc_auc_mean": 0.5849999999999999,
+    "test_accuracy": 0.7142857142857143,
+    "test_balanced_accuracy": 0.7333333333333334,
+    "test_precision": 0.5714285714285714,
     "test_recall": 0.8,
-    "test_f1": 0.8,
-    "test_roc_auc": 0.7333333333333334,
-    "best_cv_score": 0.40753968253968254
+    "test_f1": 0.6666666666666666,
+    "test_roc_auc": 0.8666666666666667,
+    "best_cv_score": 0.45690476190476187
   },
-  "best_params": "{'max_depth': None, 'min_samples_leaf': 4, 'n_estimators': 300}"
+  "best_params": "{'colsample_bytree': 0.9, 'learning_rate': 0.1, 'max_depth': 3, 'n_estimators': 100, 'subsample': 0.8}"
 }

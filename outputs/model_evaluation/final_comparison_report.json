@@ -1,11 +1,17 @@
 {
-  "experiment_name": "real",
+  "candidate_experiments": [
+    "real",
+    "real_plus_synthetic"
+  ],
   "results": [
     {
       "dataset": "mid",
       "model": "logistic_regression",
       "experiment": "real",
       "seed": 999,
+      "selected_model_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_training\\real\\seed_999\\mid\\logistic_regression\\best_model.joblib",
+      "selected_summary_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_training\\real\\best_mid_summary.json",
+      "dataset_path": "C:\\TFG-Donacion-Renal-ml-web\\data\\processed\\dataset_mid_clean.csv",
       "test_f1": 0.6666666666666666,
       "test_recall": 0.8,
       "metrics_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_evaluation\\mid\\final_metrics.json",
@@ -15,10 +21,13 @@
     },
     {
       "dataset": "transfer",
-      "model": "logistic_regression",
-      "experiment": "real",
-      "seed": 999,
-      "test_f1": 0.7272727272727273,
+      "model": "xgboost",
+      "experiment": "real_plus_synthetic",
+      "seed": 1,
+      "selected_model_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_training\\real_plus_synthetic\\seed_1\\transfer\\xgboost\\best_model.joblib",
+      "selected_summary_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_training\\real_plus_synthetic\\best_transfer_summary.json",
+      "dataset_path": "C:\\TFG-Donacion-Renal-ml-web\\data\\processed\\dataset_transfer_clean.csv",
+      "test_f1": 0.8,
       "test_recall": 0.8,
       "metrics_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_evaluation\\transfer\\final_metrics.json",
       "cm_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_evaluation\\transfer\\final_confusion_matrix.png",

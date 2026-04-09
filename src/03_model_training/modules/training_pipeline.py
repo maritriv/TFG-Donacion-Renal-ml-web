@@ -26,6 +26,7 @@ from .config import (
     TUNED_MODEL_NAMES,
     USE_VOTING_ENSEMBLE,
     VOTING_MODEL_NAME,
+    SEED_AGGREGATED_SUMMARY_FILENAME,
 )
 from .model_factory import get_model
 from .training_steps import (
@@ -118,6 +119,54 @@ def _save_json(data: dict, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
+
+
+def _build_seed_aggregated_summary(comparison_df: pd.DataFrame) -> pd.DataFrame:
+    """Construye un resumen agregado por modelo usando media y desviación típica entre seeds."""
+    grouped = (
+        comparison_df.groupby(["experiment", "dataset", "model"], as_index=False)
+        .agg(
+            n_seeds=("seed", "nunique"),
+            cv_f1_mean_mean=("cv_f1_mean", "mean"),
+            cv_f1_mean_std=("cv_f1_mean", "std"),
+            test_f1_mean=("test_f1", "mean"),
+            test_f1_std=("test_f1", "std"),
+            test_recall_mean=("test_recall", "mean"),
+            test_recall_std=("test_recall", "std"),
+            test_precision_mean=("test_precision", "mean"),
+            test_precision_std=("test_precision", "std"),
+            test_balanced_accuracy_mean=("test_balanced_accuracy", "mean"),
+            test_balanced_accuracy_std=("test_balanced_accuracy", "std"),
+            best_cv_score_mean=("best_cv_score", "mean"),
+            best_cv_score_std=("best_cv_score", "std"),
+        )
+        .sort_values(
+            by=["experiment", "dataset", "test_f1_mean", "test_recall_mean", "cv_f1_mean_mean"],
+            ascending=[True, True, False, False, False],
+        )
+        .reset_index(drop=True)
+    )
+
+    numeric_cols = [
+        "cv_f1_mean_mean",
+        "cv_f1_mean_std",
+        "test_f1_mean",
+        "test_f1_std",
+        "test_recall_mean",
+        "test_recall_std",
+        "test_precision_mean",
+        "test_precision_std",
+        "test_balanced_accuracy_mean",
+        "test_balanced_accuracy_std",
+        "best_cv_score_mean",
+        "best_cv_score_std",
+    ]
+
+    for col in numeric_cols:
+        if col in grouped.columns:
+            grouped[col] = grouped[col].fillna(0.0)
+
+    return grouped
 
 
 def run_training_pipeline(logger, use_synthetic: bool = False) -> None:
@@ -397,6 +446,10 @@ def run_training_pipeline(logger, use_synthetic: bool = False) -> None:
     comparison_path = experiment_output_dir / "comparison" / "models_comparison.csv"
     save_comparison_table(all_comparison_rows, comparison_path)
 
+    aggregated_df = _build_seed_aggregated_summary(comparison_df)
+    aggregated_path = experiment_output_dir / "comparison" / SEED_AGGREGATED_SUMMARY_FILENAME
+    aggregated_df.to_csv(aggregated_path, index=False)
+
     preview_rows = []
     for _, row in comparison_df.iterrows():
         preview_rows.append([
@@ -413,6 +466,37 @@ def run_training_pipeline(logger, use_synthetic: bool = False) -> None:
         title=f"Resumen comparativo de modelos [{experiment_suffix}]",
         columns=["Seed", "Experimento", "Dataset", "Modelo", "Best CV / CV F1", "Test F1", "Test Recall"],
         rows=preview_rows,
+        border_style="green",
+    )
+
+    aggregated_preview_rows = []
+    for _, row in aggregated_df.iterrows():
+        aggregated_preview_rows.append([
+            row["dataset"],
+            row["model"],
+            row["n_seeds"],
+            round(float(row["test_f1_mean"]), 4),
+            round(float(row["test_f1_std"]), 4),
+            round(float(row["test_recall_mean"]), 4),
+            round(float(row["test_recall_std"]), 4),
+            round(float(row["cv_f1_mean_mean"]), 4),
+            round(float(row["cv_f1_mean_std"]), 4),
+        ])
+
+    log_table(
+        title=f"Resumen agregado entre seeds [{experiment_suffix}]",
+        columns=[
+            "Dataset",
+            "Modelo",
+            "N seeds",
+            "Test F1 mean",
+            "Test F1 std",
+            "Test Recall mean",
+            "Test Recall std",
+            "CV F1 mean",
+            "CV F1 std",
+        ],
+        rows=aggregated_preview_rows,
         border_style="green",
     )
 
@@ -466,6 +550,7 @@ def run_training_pipeline(logger, use_synthetic: bool = False) -> None:
         {
             "Carpeta de salida": experiment_output_dir,
             "Comparativa global": comparison_path,
+            "Resumen agregado seeds": aggregated_path,
             "Resumen MID": best_mid_path,
             "Resumen TRANSFER": best_transfer_path,
         },

@@ -1,21 +1,21 @@
 {
   "fold_metrics": [
     {
-      "accuracy": 0.6666666666666666,
-      "balanced_accuracy": 0.5833333333333334,
-      "precision": 0.5,
-      "recall": 0.3333333333333333,
-      "f1": 0.4,
-      "roc_auc": 0.3888888888888889,
-      "fold": 1
-    },
-    {
-      "accuracy": 0.6666666666666666,
+      "accuracy": 0.5555555555555556,
       "balanced_accuracy": 0.5,
       "precision": 0.0,
       "recall": 0.0,
       "f1": 0.0,
-      "roc_auc": 0.6111111111111112,
+      "roc_auc": 0.0,
+      "fold": 1
+    },
+    {
+      "accuracy": 0.5555555555555556,
+      "balanced_accuracy": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": 0.35,
       "fold": 2
     },
     {
@@ -24,7 +24,7 @@
       "precision": 0.0,
       "recall": 0.0,
       "f1": 0.0,
-      "roc_auc": 0.7,
+      "roc_auc": 0.2,
       "fold": 3
     },
     {
@@ -33,7 +33,7 @@
       "precision": 0.0,
       "recall": 0.0,
       "f1": 0.0,
-      "roc_auc": 0.3,
+      "roc_auc": 0.2,
       "fold": 4
     },
     {
@@ -42,7 +42,7 @@
       "precision": 0.0,
       "recall": 0.0,
       "f1": 0.0,
-      "roc_auc": 0.7000000000000001,
+      "roc_auc": 0.44999999999999996,
       "fold": 5
     },
     {
@@ -51,16 +51,16 @@
       "precision": 0.0,
       "recall": 0.0,
       "f1": 0.0,
-      "roc_auc": 0.7,
+      "roc_auc": 0.55,
       "fold": 6
     },
     {
-      "accuracy": 0.5,
-      "balanced_accuracy": 0.4,
+      "accuracy": 0.625,
+      "balanced_accuracy": 0.5,
       "precision": 0.0,
       "recall": 0.0,
       "f1": 0.0,
-      "roc_auc": 0.5333333333333332,
+      "roc_auc": 0.3333333333333333,
       "fold": 7
     },
     {
@@ -69,38 +69,38 @@
       "precision": 0.0,
       "recall": 0.0,
       "f1": 0.0,
-      "roc_auc": 0.5333333333333332,
+      "roc_auc": 0.6,
       "fold": 8
     },
     {
       "accuracy": 0.625,
-      "balanced_accuracy": 0.5666666666666667,
-      "precision": 0.5,
-      "recall": 0.3333333333333333,
-      "f1": 0.4,
-      "roc_auc": 0.5333333333333332,
+      "balanced_accuracy": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": 0.4666666666666666,
       "fold": 9
     },
     {
       "accuracy": 0.625,
-      "balanced_accuracy": 0.6333333333333333,
-      "precision": 0.5,
-      "recall": 0.6666666666666666,
-      "f1": 0.5714285714285714,
-      "roc_auc": 0.6,
+      "balanced_accuracy": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": 0.2666666666666666,
       "fold": 10
     }
   ],
-  "accuracy_mean": 0.5930555555555556,
-  "accuracy_std": 0.053087541260045515,
-  "balanced_accuracy_mean": 0.5183333333333333,
-  "balanced_accuracy_std": 0.05983774357005413,
-  "precision_mean": 0.15,
-  "precision_std": 0.22912878474779202,
-  "recall_mean": 0.13333333333333333,
-  "recall_std": 0.22110831935702666,
-  "f1_mean": 0.13714285714285715,
-  "f1_std": 0.2141142170879451,
-  "roc_auc_mean": 0.5599999999999999,
-  "roc_auc_std": 0.12728891992550834
+  "accuracy_mean": 0.5833333333333334,
+  "accuracy_std": 0.03402069087198857,
+  "balanced_accuracy_mean": 0.5,
+  "balanced_accuracy_std": 0.0,
+  "precision_mean": 0.0,
+  "precision_std": 0.0,
+  "recall_mean": 0.0,
+  "recall_std": 0.0,
+  "f1_mean": 0.0,
+  "f1_std": 0.0,
+  "roc_auc_mean": 0.3416666666666667,
+  "roc_auc_std": 0.17324516988617283
 }

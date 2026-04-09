@@ -68,3 +68,6 @@ VOTING_MODEL_NAME = "voting_tuned"
 # Resumenes finales por dataset
 BEST_MID_SUMMARY_FILENAME = "best_mid_summary.json"
 BEST_TRANSFER_SUMMARY_FILENAME = "best_transfer_summary.json"
+
+# Resumen agregado entre seeds
+SEED_AGGREGATED_SUMMARY_FILENAME = "models_summary_by_seed.csv"

@@ -1,8 +1,8 @@
 {
   "best_params": {
-    "model__C": 10
+    "model__C": 0.01
   },
-  "best_cv_score": 0.6899206349206348,
+  "best_cv_score": 0.5526190476190476,
   "primary_scoring": "f1",
   "seed": 123,
   "experiment": "real_plus_synthetic"
