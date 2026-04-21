@@ -10,8 +10,9 @@ import {
   birthdateInput
 } from "./dom.js";
 
-import { clearMessages, setMessage, showView } from "./ui.js";
+import { clearMessages, setMessage } from "./ui.js";
 import { translateFirebaseError } from "./errors.js";
+import { redirectByRole } from "./auth-guard.js";
 
 export function initRegister() {
   if (calendarIcon && birthdateInput) {
@@ -59,20 +60,18 @@ export function initRegister() {
 
         await setDoc(doc(db, "users", user.uid), {
           uid: user.uid,
-          name: name,
-          lastname: lastname,
-          birthdate: birthdate,
-          email: email,
-          role: role,
+          name,
+          lastname,
+          birthdate,
+          email,
+          role,
           active: true,
           numeroPredicciones: 0,
           predicciones_validas: 0,
           predicciones_no_validas: 0
         });
 
-        setMessage(registerMessage, "Usuario registrado correctamente.", "success");
-        registerForm.reset();
-        showView("dashboard");
+        redirectByRole(role);
       } catch (error) {
         setMessage(registerMessage, translateFirebaseError(error.code), "error");
         console.error("Error en registro:", error);

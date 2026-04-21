@@ -1,5 +1,8 @@
 import { auth } from "../firebase-config.js";
-import { sendPasswordResetEmail, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 import {
   forgotPasswordBtn,
@@ -7,8 +10,9 @@ import {
   loginMessage
 } from "./dom.js";
 
-import { clearMessages, setMessage } from "./ui.js";
+import { setMessage, clearMessages } from "./ui.js";
 import { translateFirebaseError } from "./errors.js";
+import { getUserProfile, redirectByRole } from "./auth-guard.js";
 
 export function initLogin() {
   if (forgotPasswordBtn) {
@@ -44,8 +48,15 @@ export function initLogin() {
       }
 
       try {
-        await signInWithEmailAndPassword(auth, email, password);
-        setMessage(loginMessage, "Inicio de sesión correcto.", "success");
+        const credential = await signInWithEmailAndPassword(auth, email, password);
+        const profile = await getUserProfile(credential.user.uid);
+
+        if (!profile) {
+          setMessage(loginMessage, "No se encontró el perfil del usuario.", "error");
+          return;
+        }
+
+        redirectByRole(profile.role);
       } catch (error) {
         setMessage(loginMessage, translateFirebaseError(error.code), "error");
         console.error("Error en login:", error);
