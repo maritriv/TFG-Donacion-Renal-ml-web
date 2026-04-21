@@ -87,7 +87,7 @@ function initDrawerEvents() {
   if (drawerEditProfileBtn) {
     drawerEditProfileBtn.addEventListener("click", () => {
       closeDrawer();
-      console.log("Editar perfil pulsado");
+      window.location.href = "./editar-perfil.html";
     });
   }
 
@@ -106,7 +106,6 @@ async function handleLogout() {
   }
 }
 
-/* IMPORTANTE: el menú se inicializa siempre al cargar */
 initDrawerEvents();
 
 if (logoutBtn) {

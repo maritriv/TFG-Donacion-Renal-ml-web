@@ -8,9 +8,11 @@
 @import url("./css/components/topbar.css");
 @import url("./css/components/drawer.css");
 @import url("./css/components/donut.css");
+@import url("./css/components/modal.css");
 
 @import url("./css/pages/login.css");
 @import url("./css/pages/register.css");
 @import url("./css/pages/medico.css");
+@import url("./css/pages/edit-profile.css");
 
 @import url("./css/responsive/media.css");

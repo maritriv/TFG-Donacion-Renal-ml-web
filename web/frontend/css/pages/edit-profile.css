@@ -1,0 +1,92 @@
+.edit-profile-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  background: #f6f7f4;
+}
+
+.edit-profile-card {
+  width: min(980px, 92vw);
+  max-width: 980px;
+  padding: 18px 26px 22px;
+  margin: 0;
+}
+
+.edit-profile-back {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #042939;
+  cursor: pointer;
+}
+
+.edit-profile-title {
+  margin: 0 0 14px;
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1;
+  color: #042939;
+  letter-spacing: -0.5px;
+}
+
+#edit-profile-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 22px;
+  align-items: start;
+}
+
+.edit-profile-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.edit-profile-card .input-group {
+  min-height: 48px;
+  margin-top: 0;
+}
+
+.edit-profile-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
+}
+
+.edit-profile-save-btn {
+  width: 320px;
+  max-width: 100%;
+}
+
+.edit-profile-message {
+  min-height: 20px;
+  margin-top: 12px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* mismo comportamiento que en register */
+.date-group input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  display: none;
+  pointer-events: none;
+}
+
+.date-group input[type="date"]::-webkit-inner-spin-button,
+.date-group input[type="date"]::-webkit-clear-button {
+  display: none;
+}
+
+.date-group input[type="date"] {
+  position: relative;
+  cursor: pointer;
+}

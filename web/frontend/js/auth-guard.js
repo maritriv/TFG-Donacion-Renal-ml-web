@@ -74,6 +74,29 @@ export function requireRole(expectedRole, onReady) {
   });
 }
 
+export function requireAuthenticatedProfile(onReady) {
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "./index.html";
+      return;
+    }
+
+    try {
+      const profile = await getUserProfile(user.uid);
+
+      if (!profile) {
+        window.location.href = "./index.html";
+        return;
+      }
+
+      onReady(user, profile);
+    } catch (error) {
+      console.error("Error cargando perfil:", error);
+      window.location.href = "./index.html";
+    }
+  });
+}
+
 export async function logoutAndRedirect() {
   await signOut(auth);
   window.location.href = "./index.html";
