@@ -1,0 +1,68 @@
+.btn {
+  width: 100%;
+  background: #042939;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 14px 18px;
+  margin-top: 12px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.link {
+  background: none;
+  border: none;
+  margin-top: 10px;
+  font-weight: bold;
+  color: #042939;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.bottom {
+  margin-top: 14px;
+  font-size: 15px;
+}
+
+.bottom button {
+  background: none;
+  border: none;
+  font-weight: bold;
+  color: #042939;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.back {
+  background: none;
+  border: none;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #042939;
+  cursor: pointer;
+  padding: 0;
+}
+
+.action-outline-btn {
+  width: 100%;
+  min-height: 50px;
+  border: 2px solid #042939;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #042939;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+}
+
+.action-outline-btn:hover {
+  background: #fafafa;
+}
+
+.dashboard-user-message,
+.dashboard-logout-btn {
+  display: none;
+}

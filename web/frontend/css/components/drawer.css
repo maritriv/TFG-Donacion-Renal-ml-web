@@ -1,0 +1,132 @@
+body.drawer-open {
+  overflow: hidden;
+}
+
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.32);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 29;
+}
+
+.drawer-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.side-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: min(86vw, 590px);
+  height: 100vh;
+  background: #f3eef5;
+  border-top-right-radius: 28px;
+  border-bottom-right-radius: 28px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.22);
+  transform: translateX(-105%);
+  transition: transform 0.28s ease;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.side-drawer.open {
+  transform: translateX(0);
+}
+
+.drawer-header {
+  background: #042939;
+  min-height: 220px;
+  padding: 26px 24px 22px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.drawer-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.drawer-close-btn svg {
+  width: 28px;
+  height: 28px;
+  display: block;
+}
+
+.drawer-avatar {
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drawer-avatar svg {
+  width: 52px;
+  height: 52px;
+  display: block;
+}
+
+.drawer-title {
+  margin-top: 18px;
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.drawer-body {
+  padding: 28px 0 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.drawer-item-btn {
+  width: 100%;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 26px;
+  color: #4b4b4b;
+  font-size: 19px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+}
+
+.drawer-item-btn:hover {
+  background: rgba(4, 41, 57, 0.05);
+}
+
+.drawer-item-icon {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.drawer-item-icon svg {
+  width: 28px;
+  height: 28px;
+  display: block;
+}

@@ -1,0 +1,107 @@
+.input-group {
+  display: flex;
+  align-items: center;
+  border: 2px solid #042939;
+  border-radius: 30px;
+  padding: 10px 15px;
+  margin-top: 10px;
+  min-height: 54px;
+  background: #fff;
+}
+
+.input-group input,
+.input-group select {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 16px;
+  color: #042939;
+  background: transparent;
+  font-family: 'Inter', sans-serif;
+}
+
+.input-group input::placeholder {
+  color: #6b7280;
+}
+
+.input-group select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  min-width: 20px;
+  color: #042939;
+}
+
+.icon svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.clickable-icon {
+  cursor: pointer;
+}
+
+/* FECHA: solo icono izquierdo */
+
+.date-group input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  display: none;
+  pointer-events: none;
+}
+
+.date-group input[type="date"]::-webkit-inner-spin-button,
+.date-group input[type="date"]::-webkit-clear-button {
+  display: none;
+}
+
+.date-group input[type="date"] {
+  position: relative;
+  cursor: pointer;
+}
+
+.chart-filter {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.chart-select {
+  width: 100%;
+  min-height: 52px;
+  border: 2px solid #042939;
+  border-radius: 999px;
+  padding: 0 56px 0 22px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #042939;
+  background: #ffffff;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.chart-select-icon {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.chart-select-icon svg {
+  width: 22px;
+  height: 22px;
+}

@@ -1,0 +1,28 @@
+.page-login {
+  text-align: center;
+  padding-top: 20px;
+}
+
+.header-login {
+  margin-top: -10px;
+}
+
+.header-login h1 {
+  font-family: 'Amatic SC', cursive;
+  font-size: 70px;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.header-login p {
+  font-size: 18px;
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+
+#login-message {
+  min-height: 20px;
+  margin-top: 12px;
+  text-align: center;
+  font-size: 14px;
+}

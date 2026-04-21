@@ -1,0 +1,175 @@
+@media (min-width: 1101px) {
+  body {
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 1100px) {
+  body {
+    overflow: auto;
+  }
+
+  .dashboard-content {
+    min-height: auto;
+    align-items: stretch;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-card,
+  .actions-card {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  #register-view.active {
+    align-items: flex-start;
+    padding: 14px;
+  }
+
+  .register-wide {
+    max-width: 560px;
+    width: min(560px, 94vw);
+    padding: 22px 20px 24px;
+  }
+
+  .register-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .role-block label,
+  .role-block .input-group {
+    width: 100%;
+  }
+
+  .register-btn {
+    width: 100%;
+  }
+
+  .register-wide h1 {
+    font-size: 38px;
+  }
+}
+
+@media (max-width: 700px) {
+  .topbar {
+    height: 72px;
+    padding: 0 18px;
+  }
+
+  .topbar-title {
+    font-size: 18px;
+  }
+
+  .dashboard-content {
+    padding: 22px 14px 20px;
+  }
+
+  .chart-card {
+    padding: 18px 16px 20px;
+  }
+
+  .actions-card {
+    padding: 18px 16px 20px;
+  }
+
+  .donut-chart {
+    width: 260px;
+    height: 260px;
+  }
+
+  .donut-chart::after {
+    width: 176px;
+    height: 176px;
+  }
+
+  .donut-number {
+    font-size: 44px;
+  }
+
+  .donut-label {
+    font-size: 15px;
+  }
+
+  .chart-legend {
+    gap: 20px;
+    font-size: 15px;
+  }
+
+  .action-outline-btn {
+    min-height: 54px;
+    font-size: 16px;
+  }
+
+  .side-drawer {
+    width: min(88vw, 560px);
+    border-top-right-radius: 24px;
+    border-bottom-right-radius: 24px;
+  }
+
+  .drawer-header {
+    min-height: 190px;
+    padding: 22px 20px 20px;
+  }
+
+  .drawer-avatar {
+    width: 88px;
+    height: 88px;
+  }
+
+  .drawer-avatar svg {
+    width: 44px;
+    height: 44px;
+  }
+
+  .drawer-title {
+    font-size: 20px;
+  }
+
+  .drawer-item-btn {
+    font-size: 17px;
+    padding: 16px 22px;
+  }
+}
+
+@media (max-width: 600px) {
+  .page-login {
+    padding-top: 10px;
+  }
+
+  .header-login h1 {
+    font-size: 56px;
+  }
+
+  .header-login p {
+    font-size: 16px;
+    margin-bottom: 18px;
+  }
+
+  .card {
+    width: calc(100vw - 32px);
+    max-width: 100%;
+    padding: 22px 18px;
+  }
+
+  .card h2 {
+    font-size: 22px;
+  }
+
+  .input-group {
+    min-height: 52px;
+    padding: 10px 14px;
+  }
+
+  .btn {
+    padding: 13px 16px;
+  }
+
+  .register-wide h1 {
+    font-size: 34px;
+  }
+}
