@@ -64,17 +64,53 @@
     <main class="dashboard-content">
       <section class="dashboard-grid">
         <article class="dashboard-card chart-card">
-          <div class="chart-filter">
-            <select id="prediction-filter" class="chart-select">
-              <option>Todos los momentos</option>
-              <option>Mitad del procedimiento de RCP (20 min)</option>
-              <option>Después del procedimiento de RCP</option>
-            </select>
-            <span class="chart-select-icon">
-              <svg viewBox="0 0 24 24">
-                <path d="M7,10l5,5l5,-5z" fill="#042939"></path>
-              </svg>
-            </span>
+          <div id="prediction-filter" class="chart-filter">
+            <button
+              type="button"
+              id="prediction-filter-trigger"
+              class="chart-select-trigger"
+              aria-haspopup="listbox"
+              aria-expanded="false"
+            >
+              <span id="prediction-filter-label">Todos los momentos</span>
+
+              <span class="chart-select-icon">
+                <svg viewBox="0 0 24 24">
+                  <path d="M7,10l5,5l5,-5z" fill="#042939"></path>
+                </svg>
+              </span>
+            </button>
+
+            <div
+              id="prediction-filter-dropdown"
+              class="chart-select-dropdown"
+              role="listbox"
+              aria-label="Filtrar predicciones"
+            >
+              <button
+                type="button"
+                class="chart-select-option active"
+                data-value="all"
+              >
+                Todos los momentos
+              </button>
+
+              <button
+                type="button"
+                class="chart-select-option"
+                data-value="MID_RCP"
+              >
+                Mitad del procedimiento de RCP (20 min)
+              </button>
+
+              <button
+                type="button"
+                class="chart-select-option"
+                data-value="AFTER_RCP"
+              >
+                Después del procedimiento de RCP
+              </button>
+            </div>
           </div>
 
           <div class="donut-wrapper">

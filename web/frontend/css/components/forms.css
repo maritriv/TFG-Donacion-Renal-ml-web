@@ -68,40 +68,90 @@
   cursor: pointer;
 }
 
+/* CUSTOM SELECT REDONDO */
+
 .chart-filter {
   position: relative;
   margin-bottom: 10px;
+  z-index: 20;
 }
 
-.chart-select {
+.chart-select-trigger {
   width: 100%;
   min-height: 52px;
   border: 2px solid #042939;
   border-radius: 999px;
-  padding: 0 56px 0 22px;
+  padding: 0 18px 0 22px;
   font-size: 15px;
   font-weight: 700;
   color: #042939;
   background: #ffffff;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+
+.chart-select-trigger:focus {
+  outline: none;
+}
+
+.chart-select-trigger[aria-expanded="true"] {
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+}
+
+.chart-select-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 100%;
+  background: #ffffff;
+  border: 2px solid #042939;
+  border-radius: 30px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.10);
+  padding: 10px;
+  display: none;
+  z-index: 30;
+}
+
+.chart-filter.open .chart-select-dropdown {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chart-select-option {
+  width: 100%;
+  border: none;
+  background: transparent;
+  border-radius: 18px;
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 600;
+  color: #042939;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: background 0.2s ease;
+}
+
+.chart-select-option:hover,
+.chart-select-option.active {
+  background: #f3f6f8;
 }
 
 .chart-select-icon {
-  position: absolute;
-  right: 18px;
-  top: 50%;
-  transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
+  flex-shrink: 0;
 }
 
 .chart-select-icon svg {
   width: 22px;
   height: 22px;
+  display: block;
 }
