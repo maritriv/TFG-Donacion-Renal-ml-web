@@ -74,7 +74,6 @@
   font-size: 14px;
 }
 
-/* mismo comportamiento que en register */
 .date-group input[type="date"]::-webkit-calendar-picker-indicator {
   opacity: 0;
   display: none;

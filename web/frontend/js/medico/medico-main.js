@@ -1,5 +1,5 @@
-import { db } from "../../firebase-config.js";
 import { requireRole, logoutAndRedirect } from "../auth-guard.js";
+import { db } from "../../firebase-config.js";
 
 import {
   collection,
@@ -23,70 +23,30 @@ const sideDrawer = document.getElementById("side-drawer");
 const drawerLogoutBtn = document.getElementById("drawer-logout-btn");
 const drawerEditProfileBtn = document.getElementById("drawer-edit-profile-btn");
 
-const MODE_MID = "MID_RCP";
-const MODE_AFTER = "AFTER_RCP";
+const btnGoPredictionMode = document.getElementById("btn-go-prediction-mode");
 
-let allPredicciones = [];
-let filtroActual = "all";
+let currentUser = null;
 
 function calcularPorcentaje(parte, total) {
   if (!total || total <= 0) return 0;
   return Math.round((parte / total) * 100);
 }
 
-function normalizarTexto(valor) {
-  return String(valor || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim()
-    .toLowerCase();
-}
-
 function esPrediccionValida(rawVal) {
-  if (typeof rawVal === "boolean") return rawVal;
-
-  if (typeof rawVal === "string") {
-    const valor = normalizarTexto(rawVal);
-    return (
-      valor === "si" ||
-      valor === "sí" ||
-      valor === "true" ||
-      valor === "1"
-    );
+  if (typeof rawVal === "boolean") {
+    return rawVal;
   }
 
   if (typeof rawVal === "number") {
     return rawVal !== 0;
   }
 
+  if (typeof rawVal === "string") {
+    const valor = rawVal.trim().toLowerCase();
+    return valor === "si" || valor === "sí" || valor === "true" || valor === "1";
+  }
+
   return false;
-}
-
-function obtenerModoPrediccion(data) {
-  const predictionMode = String(data?.prediction_mode || "").trim();
-  const momentoLegible = normalizarTexto(data?.modelos?.momento_prediccion_legible);
-
-  if (predictionMode === MODE_MID || predictionMode === MODE_AFTER) {
-    return predictionMode;
-  }
-
-  if (
-    momentoLegible.includes("mitad del procedimiento") ||
-    momentoLegible.includes("20 min") ||
-    momentoLegible.includes("mitad")
-  ) {
-    return MODE_MID;
-  }
-
-  if (
-    momentoLegible.includes("despues del procedimiento") ||
-    momentoLegible.includes("después del procedimiento") ||
-    momentoLegible.includes("despues")
-  ) {
-    return MODE_AFTER;
-  }
-
-  return null;
 }
 
 function renderDonut(validas, noValidas) {
@@ -119,57 +79,44 @@ function renderDonut(validas, noValidas) {
   }
 }
 
-function aplicarFiltroYRender() {
-  let prediccionesFiltradas = allPredicciones;
+async function cargarEstadisticasPorModo(uidMedico, mode = "all") {
+  try {
+    let prediccionesQuery;
 
-  if (filtroActual !== "all") {
-    prediccionesFiltradas = allPredicciones.filter(
-      (pred) => pred.modo === filtroActual
-    );
-  }
-
-  let validas = 0;
-  let noValidas = 0;
-
-  prediccionesFiltradas.forEach((pred) => {
-    if (pred.valida) {
-      validas += 1;
+    if (!mode || mode === "all") {
+      prediccionesQuery = query(
+        collection(db, "predicciones"),
+        where("uid_medico", "==", uidMedico)
+      );
     } else {
-      noValidas += 1;
+      prediccionesQuery = query(
+        collection(db, "predicciones"),
+        where("uid_medico", "==", uidMedico),
+        where("prediction_mode", "==", mode)
+      );
     }
-  });
 
-  renderDonut(validas, noValidas);
-}
+    const snapshot = await getDocs(prediccionesQuery);
 
-async function cargarPrediccionesMedico(uidMedico) {
-  const prediccionesRef = collection(db, "predicciones");
-  const q = query(prediccionesRef, where("uid_medico", "==", uidMedico));
-  const snapshot = await getDocs(q);
+    let validas = 0;
+    let noValidas = 0;
 
-  allPredicciones = snapshot.docs.map((docSnap) => {
-    const data = docSnap.data();
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      const rawVal = data.valido;
 
-    return {
-      id: docSnap.id,
-      valida: esPrediccionValida(data?.valido),
-      modo: obtenerModoPrediccion(data),
-      raw: data
-    };
-  });
+      if (esPrediccionValida(rawVal)) {
+        validas++;
+      } else {
+        noValidas++;
+      }
+    });
 
-  console.log(
-    "Predicciones cargadas:",
-    allPredicciones.map((p) => ({
-      id: p.id,
-      modo: p.modo,
-      valida: p.valida,
-      prediction_mode: p.raw?.prediction_mode,
-      momento_legible: p.raw?.modelos?.momento_prediccion_legible
-    }))
-  );
-
-  aplicarFiltroYRender();
+    renderDonut(validas, noValidas);
+  } catch (error) {
+    console.error("Error cargando estadísticas:", error);
+    renderDonut(0, 0);
+  }
 }
 
 function openDrawer() {
@@ -214,7 +161,7 @@ function initDrawerEvents() {
   if (drawerEditProfileBtn) {
     drawerEditProfileBtn.addEventListener("click", () => {
       closeDrawer();
-      window.location.href = "./editar-perfil.html";
+      window.location.href = "../../html/editar-perfil.html";
     });
   }
 
@@ -235,22 +182,27 @@ function initPredictionFilter() {
 
   trigger.addEventListener("click", (event) => {
     event.stopPropagation();
-    const abierto = container.classList.toggle("open");
-    trigger.setAttribute("aria-expanded", abierto ? "true" : "false");
+    container.classList.toggle("open");
+    trigger.setAttribute(
+      "aria-expanded",
+      container.classList.contains("open") ? "true" : "false"
+    );
   });
 
   options.forEach((option) => {
-    option.addEventListener("click", () => {
+    option.addEventListener("click", async () => {
       options.forEach((opt) => opt.classList.remove("active"));
       option.classList.add("active");
 
       label.textContent = option.textContent.trim();
-      filtroActual = option.dataset.value || "all";
-
       container.classList.remove("open");
       trigger.setAttribute("aria-expanded", "false");
 
-      aplicarFiltroYRender();
+      const selectedMode = option.dataset.value;
+
+      if (currentUser?.uid) {
+        await cargarEstadisticasPorModo(currentUser.uid, selectedMode);
+      }
     });
   });
 
@@ -260,6 +212,14 @@ function initPredictionFilter() {
       trigger.setAttribute("aria-expanded", "false");
     }
   });
+}
+
+function initPredictionModeButton() {
+  if (btnGoPredictionMode) {
+    btnGoPredictionMode.addEventListener("click", () => {
+      window.location.href = "../../html/prediction-mode.html";
+    });
+  }
 }
 
 async function handleLogout() {
@@ -272,6 +232,7 @@ async function handleLogout() {
 
 initDrawerEvents();
 initPredictionFilter();
+initPredictionModeButton();
 
 if (logoutBtn) {
   logoutBtn.addEventListener("click", handleLogout);
@@ -282,6 +243,8 @@ if (drawerLogoutBtn) {
 }
 
 requireRole("Médico", async (user, profile) => {
+  currentUser = user;
+
   if (message) {
     const nombre = profile?.name || "";
     const apellido = profile?.lastname || "";
@@ -289,10 +252,5 @@ requireRole("Médico", async (user, profile) => {
     message.textContent = `Bienvenido/a, ${nombreCompleto || user.email}.`;
   }
 
-  try {
-    await cargarPrediccionesMedico(user.uid);
-  } catch (error) {
-    console.error("Error cargando predicciones del médico:", error);
-    renderDonut(0, 0);
-  }
+  await cargarEstadisticasPorModo(user.uid, "all");
 });

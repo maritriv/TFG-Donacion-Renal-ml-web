@@ -50,7 +50,6 @@
   cursor: pointer;
 }
 
-/* FECHA: solo icono izquierdo */
 
 .date-group input[type="date"]::-webkit-calendar-picker-indicator {
   opacity: 0;

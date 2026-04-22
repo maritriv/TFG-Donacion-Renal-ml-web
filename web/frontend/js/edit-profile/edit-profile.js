@@ -126,7 +126,7 @@ function hasChanges() {
 
 function goBackByRole() {
   if (!currentProfile?.role) {
-    window.location.href = "./index.html";
+    window.location.href = "../../html/index.html";
     return;
   }
 
@@ -147,7 +147,7 @@ async function loadProfile(user) {
   const userSnap = await getDoc(userRef);
 
   if (!userSnap.exists()) {
-    window.location.href = "./index.html";
+    window.location.href = "../../html/index.html";
     return;
   }
 
@@ -325,7 +325,7 @@ function initEvents() {
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    window.location.href = "./index.html";
+    window.location.href = "../../html/index.html";
     return;
   }
 
@@ -337,6 +337,6 @@ onAuthStateChanged(auth, async (user) => {
     await loadProfile(user);
   } catch (error) {
     console.error("Error cargando perfil:", error);
-    window.location.href = "./index.html";
+    window.location.href = "../../html/index.html";
   }
 });
