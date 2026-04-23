@@ -1,0 +1,12 @@
+{
+  "test_f1": 0.8333333333333334,
+  "test_recall": 1.0,
+  "selected_dataset": "transfer",
+  "selected_model_name": "logistic_regression",
+  "selected_experiment": "real_plus_synthetic",
+  "selected_seed": 999,
+  "selection_based_on": {
+    "primary": "test_f1",
+    "secondary": "test_recall"
+  }
+}

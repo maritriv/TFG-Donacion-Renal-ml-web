@@ -1,0 +1,17 @@
+{
+  "selected_experiment": "real",
+  "selected_model_name": "logistic_regression",
+  "selected_dataset": "mid",
+  "selected_seed": 999,
+  "original_model_path": "outputs\\model_training\\real\\seed_999\\mid\\logistic_regression\\best_model.joblib",
+  "evaluation_report_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\model_evaluation\\final_comparison_report.json",
+  "exported_model_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\final_model_export\\mid\\final_model.joblib",
+  "retrained_with_full_dataset": true,
+  "used_synthetic_data": false,
+  "real_dataset_path": "C:\\TFG-Donacion-Renal-ml-web\\data\\processed\\dataset_mid_clean.csv",
+  "synthetic_dataset_path": null,
+  "n_real_rows": 70,
+  "n_synthetic_rows": 0,
+  "n_training_rows_full_dataset": 70,
+  "n_training_features": 12
+}

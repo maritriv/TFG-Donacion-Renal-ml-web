@@ -1,8 +1,0 @@
-{
-  "best_params": {
-    "model__C": 10,
-    "model__gamma": 0.01
-  },
-  "best_cv_score": 0.6766666666666666,
-  "primary_scoring": "f1"
-}

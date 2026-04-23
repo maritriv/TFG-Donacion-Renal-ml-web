@@ -36,6 +36,8 @@ outputs/model_evaluation/
 05_final_model_export
         ↓
 outputs/final_model_export/
+```
+
 
 ## Entradas principales
 
@@ -76,6 +78,15 @@ outputs/final_model_export/
 
 ### Fase 04 · Evaluación final
 
+La fase de evaluación compara los modelos entrenados para cada momento de predicción:
+
+- `mid`
+- `transfer`
+
+A partir de esta comparativa, se selecciona el mejor candidato final para cada dataset según las métricas de evaluación.
+
+Salidas principales:
+
 - `outputs/model_evaluation/final_comparison_report.json`
 - `outputs/model_evaluation/final_evaluation_report.json`
 - `outputs/model_evaluation/final_metrics.json`
@@ -84,15 +95,27 @@ outputs/final_model_export/
 
 ### Fase 05 · Exportación final
 
-- `outputs/final_model_export/final_model.joblib`
-- `outputs/final_model_export/final_model_metadata.json`
-- `outputs/final_model_export/final_metrics.json`
+La fase de exportación final reentrena y exporta un modelo final independiente para cada momento de predicción:
 
----
+- un modelo final para `mid`
+- un modelo final para `transfer`
 
-## Ejecución
+Cada modelo se reentrena usando:
 
-### Pipeline completo
+- todos los datos reales del dataset correspondiente
+- y además los datos sintéticos si el experimento ganador fue `real_plus_synthetic`
 
+Salidas principales:
+
+- `outputs/final_model_export/mid/final_model.joblib`
+- `outputs/final_model_export/mid/final_model_metadata.json`
+- `outputs/final_model_export/mid/final_metrics.json`
+- `outputs/final_model_export/transfer/final_model.joblib`
+- `outputs/final_model_export/transfer/final_model_metadata.json`
+- `outputs/final_model_export/transfer/final_metrics.json`
+- `outputs/final_model_export/final_models_report.json`
+
+## Ejecución Pipeline Completo_
 ```bash
 uv run -m src.main
+```

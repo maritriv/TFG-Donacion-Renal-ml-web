@@ -1,28 +1,28 @@
 {
   "dataset": "mid",
-  "selected_model_name": "xgboost",
+  "selected_model_name": "logistic_regression",
   "selected_experiment": "real_plus_synthetic",
   "selected_seed": 999,
-  "selected_model_path": "outputs\\model_training\\real_plus_synthetic\\seed_999\\mid\\xgboost\\best_model.joblib",
+  "selected_model_path": "outputs\\model_training\\real_plus_synthetic\\seed_999\\mid\\logistic_regression\\best_model.joblib",
   "selection_criteria": {
     "primary": "test_f1",
     "secondary": "test_recall",
     "tertiary": "cv_f1_mean"
   },
   "metrics": {
-    "cv_accuracy_mean": 0.5694444444444444,
-    "cv_balanced_accuracy_mean": 0.5616666666666666,
-    "cv_precision_mean": 0.4866666666666667,
-    "cv_recall_mean": 0.4833333333333334,
-    "cv_f1_mean": 0.45690476190476187,
-    "cv_roc_auc_mean": 0.5849999999999999,
-    "test_accuracy": 0.7142857142857143,
-    "test_balanced_accuracy": 0.7333333333333334,
-    "test_precision": 0.5714285714285714,
-    "test_recall": 0.8,
+    "cv_accuracy_mean": 0.6152777777777778,
+    "cv_balanced_accuracy_mean": 0.6024999999999999,
+    "cv_precision_mean": 0.445,
+    "cv_recall_mean": 0.5916666666666666,
+    "cv_f1_mean": 0.49523809523809526,
+    "cv_roc_auc_mean": 0.5816666666666668,
+    "test_accuracy": 0.7857142857142857,
+    "test_balanced_accuracy": 0.7444444444444445,
+    "test_precision": 0.75,
+    "test_recall": 0.6,
     "test_f1": 0.6666666666666666,
-    "test_roc_auc": 0.8666666666666667,
-    "best_cv_score": 0.45690476190476187
+    "test_roc_auc": 0.7555555555555555,
+    "best_cv_score": 0.49523809523809526
   },
-  "best_params": "{'colsample_bytree': 0.9, 'learning_rate': 0.1, 'max_depth': 3, 'n_estimators': 100, 'subsample': 0.8}"
+  "best_params": "{'model__C': 10}"
 }
