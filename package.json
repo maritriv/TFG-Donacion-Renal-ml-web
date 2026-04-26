@@ -1,0 +1,31 @@
+{
+  "name": "tfg-donacion-renal-ml-web",
+  "version": "1.0.0",
+  "description": "Trabajo de Fin de Grado - Aplicación móvil para la **predicción de donantes renales válidos en asistolia no controlada (uDCD)** usando **capnometría** (EtCO₂ en punto medio y en transferencia) y variables clínicas mínimas.\r ---",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "backend": "uv run uvicorn web.backend.main:app --reload --host 127.0.0.1 --port 8001",
+    "frontend": "cd web/frontend && python -m http.server 8000",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maritriv/TFG-Donacion-Renal-ml-web.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/maritriv/TFG-Donacion-Renal-ml-web/issues"
+  },
+  "homepage": "https://github.com/maritriv/TFG-Donacion-Renal-ml-web#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

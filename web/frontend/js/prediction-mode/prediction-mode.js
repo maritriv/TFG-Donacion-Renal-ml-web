@@ -13,17 +13,13 @@ requireRole("Médico", async () => {
 
   if (btnModeMid) {
     btnModeMid.addEventListener("click", () => {
-      console.log("Modo seleccionado: MID_RCP");
-      // Después aquí conectaremos con el cuestionario real
-      // window.location.href = "../../html/prediction.html?mode=MID_RCP";
+      window.location.href = "../../html/prediction.html?mode=mid";
     });
   }
 
   if (btnModeAfter) {
     btnModeAfter.addEventListener("click", () => {
-      console.log("Modo seleccionado: AFTER_RCP");
-      // Después aquí conectaremos con el cuestionario real
-      // window.location.href = "../../html/prediction.html?mode=AFTER_RCP";
+      window.location.href = "../../html/prediction.html?mode=transfer";
     });
   }
 });

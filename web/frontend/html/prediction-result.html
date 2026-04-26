@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resultado de predicción</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+
+<body>
+  <section id="prediction-result-view" class="view active">
+    <div class="result-page-card">
+
+      <h1>Resultado de la predicción</h1>
+      <p id="comparison-message" class="comparison-message"></p>
+
+      <div class="result-cards-grid">
+
+        <article class="single-result-card">
+          <h2>Modelo basado en reglas</h2>
+
+          <div id="rules-circle" class="result-circle">
+            <div class="result-circle-inner">
+              <span id="rules-icon" class="result-symbol"></span>
+            </div>
+          </div>
+
+          <p id="rules-label" class="main-result-label"></p>
+          <p id="rules-index" class="result-extra-info"></p>
+        </article>
+
+        <article class="single-result-card">
+          <h2>Modelo de aprendizaje automático</h2>
+
+          <div id="ml-circle" class="result-circle">
+            <div class="result-circle-inner">
+              <span id="ml-icon" class="result-symbol"></span>
+            </div>
+          </div>
+
+          <p id="ml-label" class="main-result-label"></p>
+          <p id="ml-probability" class="result-extra-info"></p>
+        </article>
+
+      </div>
+
+      <div class="result-actions">
+        <button type="button" id="btn-back-main" class="action-outline-btn">
+          VOLVER AL MENÚ PRINCIPAL
+        </button>
+
+        <button type="button" id="btn-download-pdf" class="action-outline-btn">
+          DESCARGAR PDF
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script type="module" src="../js/prediction/prediction-result.js"></script>
+</body>
+</html>

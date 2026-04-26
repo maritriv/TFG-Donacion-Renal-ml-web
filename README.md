@@ -320,11 +320,47 @@ Estos resultados muestran que el mejor modelo no fue el mismo escenario experime
 
 ## Ejecución de la aplicación web
 
-La aplicación web está implementada como un frontend en HTML y JavaScript (ES modules), por lo que necesita ejecutarse sobre un servidor local.
+La aplicación web está compuesta por:
 
-### Opción 1 · Servidor local con Python (recomendada)
+- Backend (FastAPI + modelo de Machine Learning)
+- Frontend (HTML + JavaScript ES modules)
+
+Por ello, es necesario ejecutar ambos servicios.
+
+---
+
+## Opción 1 · Ejecución completa (recomendada)
+
+Permite lanzar **frontend + backend automáticamente en una sola terminal**.
 
 Desde la raíz del proyecto:
+
+```bash
+npm run dev
+```
+
+Esto ejecuta:
+
+- Backend → http://127.0.0.1:8001  
+- Frontend → http://localhost:8000  
+
+Abrir en el navegador:
+
+http://localhost:8000/html/index.html
+
+## Opción 2 · Ejecución manual (2 terminales)
+
+### Terminal 1 → Backend
+
+Desde la raíz del proyecto:
+
+```bash
+uv run uvicorn web.backend.main:app --reload --host 127.0.0.1 --port 8001
+```
+
+## Terminal 2 → Frontend
+
+En otra terminal distinta:
 
 ```bash
 cd web/frontend
@@ -336,7 +372,8 @@ Abrir en el navegador:
 
 ⚠️ Es importante acceder siempre a través de /html/index.html y no abrir el archivo directamente (file://), ya que los módulos de JavaScript y las rutas no funcionarán correctamente.
 
-### Opción 2 · Live Server (VS Code)
+
+### Opción 3 · Live Server (VS Code)
 
 1. Instalar la extensión Live Server
 

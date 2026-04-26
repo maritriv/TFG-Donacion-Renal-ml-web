@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Formulario de predicción</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+
+<body>
+  <section id="prediction-view" class="view active">
+    <div class="card prediction prediction-wide">
+
+      <button type="button" id="btn-back" class="back">← Volver</button>
+
+      <h1 id="form-title">Formulario</h1>
+
+      <form id="prediction-form">
+        <div class="prediction-grid">
+          <div class="prediction-column">
+            <div class="input-group">
+              <input id="edad" type="number" placeholder="Edad" required>
+            </div>
+
+            <div class="field-block">
+              <label for="sexo">Sexo</label>
+              <div class="input-group select-group">
+                <span class="icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M7,10l5,5l5,-5z" fill="#042939"/>
+                  </svg>
+                </span>
+                <select id="sexo" required>
+                  <option value="0">Hombre</option>
+                  <option value="1">Mujer</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <input id="imc" type="number" step="0.01" placeholder="IMC" required>
+            </div>
+
+            <div class="field-block">
+              <label for="grupo-sanguineo">Grupo sanguíneo</label>
+              <div class="input-group select-group">
+                <span class="icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M7,10l5,5l5,-5z" fill="#042939"/>
+                  </svg>
+                </span>
+                <select id="grupo-sanguineo" required>
+                  <option value="0">A</option>
+                  <option value="1">B</option>
+                  <option value="2">AB</option>
+                  <option value="3">O</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <input id="capnometria" type="number" placeholder="Capnometría" required>
+            </div>
+          </div>
+
+          <div class="prediction-column">
+            <div class="input-group">
+              <input id="adrenalina" type="number" step="1" placeholder="Número de dosis de adrenalina" required>
+            </div>
+
+            <div class="field-block">
+              <label for="colesterol">¿Colesterol?</label>
+              <div class="input-group select-group">
+                <span class="icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M7,10l5,5l5,-5z" fill="#042939"/>
+                  </svg>
+                </span>
+                <select id="colesterol" required>
+                  <option value="0">No</option>
+                  <option value="1">Sí</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-block">
+              <label for="causa-cardiaca">¿Causa cardíaca?</label>
+              <div class="input-group select-group">
+                <span class="icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M7,10l5,5l5,-5z" fill="#042939"/>
+                  </svg>
+                </span>
+                <select id="causa-cardiaca" required>
+                  <option value="1">Sí</option>
+                  <option value="0">No</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-block">
+              <label for="cardio-manual">¿Cardiocompresión extrahospitalaria?</label>
+              <div class="input-group select-group">
+                <span class="icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M7,10l5,5l5,-5z" fill="#042939"/>
+                  </svg>
+                </span>
+                <select id="cardio-manual" required>
+                  <option value="0">Mecánica</option>
+                  <option value="1">Manual</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-block">
+              <label for="recuperacion">¿Recuperación de la circulación?</label>
+              <div class="input-group select-group">
+                <span class="icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M7,10l5,5l5,-5z" fill="#042939"/>
+                  </svg>
+                </span>
+                <select id="recuperacion" required>
+                  <option value="1">Sí</option>
+                  <option value="0">No</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prediction-actions">
+          <button type="submit" class="btn prediction-btn">Realizar predicción</button>
+        </div>
+      </form>
+
+    </div>
+  </section>
+
+  <script type="module" src="../js/prediction/prediction.js"></script>
+</body>
+</html>

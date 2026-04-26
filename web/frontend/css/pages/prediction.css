@@ -1,0 +1,112 @@
+.prediction {
+  max-width: 450px;
+}
+
+#prediction-view {
+  padding: 0;
+}
+
+#prediction-view.active {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+#prediction-view .card {
+  margin: 0;
+}
+
+#prediction-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.prediction-wide {
+  max-width: 980px;
+  width: min(980px, 92vw);
+  padding: 22px 28px 24px;
+}
+
+.prediction-wide h1 {
+  margin-top: 0;
+  margin-bottom: 14px;
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1;
+  color: #042939;
+  letter-spacing: -0.5px;
+}
+
+.prediction-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 24px;
+  align-items: start;
+}
+
+.prediction-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#prediction-view .input-group {
+  min-height: 50px;
+  margin-top: 0;
+}
+
+.field-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-block label {
+  font-size: 16px;
+  font-weight: 700;
+  color: #042939;
+}
+
+.select-group {
+  position: relative;
+}
+
+.select-group .icon {
+  pointer-events: none;
+}
+
+.select-group select {
+  cursor: pointer;
+}
+
+.prediction-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
+}
+
+.prediction-btn {
+  width: 320px;
+  max-width: 100%;
+}
+
+.prediction-result {
+  margin-top: 22px;
+  padding: 18px;
+  border: 2px solid #042939;
+  border-radius: 22px;
+  color: #042939;
+}
+
+.prediction-result h2 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #042939;
+}
+
+.prediction-result p {
+  margin: 8px 0;
+  font-size: 15px;
+}
