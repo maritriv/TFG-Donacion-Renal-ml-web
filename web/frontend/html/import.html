@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Importar predicciones</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+
+<body>
+  <section id="import-view" class="view active">
+    <div class="import-card">
+      <h1>IMPORTAR PREDICCIONES</h1>
+
+      <div id="file-picker-area" class="import-file-picker">
+        <input id="csv-input" type="file" accept=".csv,text/csv" hidden />
+
+        <span id="file-name">Selecciona un archivo CSV...</span>
+
+        <button type="button" id="btn-clear-file" class="import-clear-btn" hidden>
+          ✕
+        </button>
+      </div>
+
+      <div id="import-progress-wrapper" class="import-progress-wrapper" hidden>
+        <div id="import-progress-bar" class="import-progress-bar"></div>
+      </div>
+
+      <button type="button" id="btn-add-predictions" class="action-outline-btn import-add-btn" hidden disabled>
+        AÑADIR FILAS
+      </button>
+
+      <button type="button" id="btn-help" class="action-outline-btn">
+        AYUDA FORMATO CSV
+      </button>
+
+      <button type="button" id="btn-back-main" class="btn import-back-btn">
+        VOLVER
+      </button>
+    </div>
+  </section>
+
+  <div id="csv-help-overlay" class="import-modal-overlay" hidden>
+    <div class="import-help-card">
+      <h2>Formato del archivo CSV</h2>
+
+      <p>Solo se acepta el CSV exportado desde la web.</p>
+
+      <p>
+        <strong>Columnas obligatorias:</strong><br>
+        Edad, Femenino, Capnometria, Causa_cardiaca, Cardio_manual,
+        Recuperacion_pulso, Prediction_mode
+      </p>
+
+      <p>
+        <strong>Reglas:</strong><br>
+        • Femenino, Causa_cardiaca y Recuperacion_pulso deben ser Si/No.<br>
+        • También se aceptan 1/0, true/false, Hombre/Mujer o Masculino/Femenino.<br>
+        • Cardio_manual debe ser Manual o Mecánica.<br>
+        • Prediction_mode debe ser MID_RCP o AFTER_RCP.
+      </p>
+
+      <p>
+        <strong>Notas:</strong><br>
+        • MID_RCP corresponde a la predicción a los 20 minutos de RCP.<br>
+        • AFTER_RCP corresponde a la predicción después del procedimiento de RCP.<br>
+        • Si falta alguna columna obligatoria o algún valor no es válido, el archivo no se importará.
+      </p>
+
+      <button type="button" id="btn-help-ok" class="btn import-modal-main-btn">
+        ENTENDIDO
+      </button>
+    </div>
+  </div>
+
+  <div id="duplicate-overlay" class="import-modal-overlay" hidden>
+    <div class="import-duplicate-card">
+      <h2 id="duplicate-title">Filas duplicadas detectadas</h2>
+      <p id="duplicate-message"></p>
+
+      <div class="import-modal-actions">
+        <button type="button" id="btn-duplicate-cancel">Cancelar</button>
+        <button type="button" id="btn-duplicate-confirm">Importar resto</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/import/import.js"></script>
+</body>
+</html>

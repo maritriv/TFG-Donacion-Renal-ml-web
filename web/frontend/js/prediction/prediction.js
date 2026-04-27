@@ -48,8 +48,7 @@ function generatePredictionId() {
 }
 
 function getNumber(id) {
-  const value = document.getElementById(id).value;
-  return Number(value);
+  return Number(document.getElementById(id).value);
 }
 
 function getStringFromSelect(id) {
@@ -91,44 +90,16 @@ function getFormValues() {
 }
 
 function validateValues(values) {
-  if (!Number.isFinite(values.edad)) {
-    throw new Error("Edad obligatoria.");
-  }
-
-  if (!Number.isFinite(values.capnometria)) {
-    throw new Error("Capnometría obligatoria.");
-  }
-
-  if (!Number.isFinite(values.imc)) {
-    throw new Error("IMC obligatorio para el modelo de aprendizaje automático.");
-  }
-
-  if (!Number.isFinite(values.adrenalina)) {
-    throw new Error("Número de dosis de adrenalina obligatorio para el modelo de aprendizaje automático.");
-  }
+  if (!Number.isFinite(values.edad)) throw new Error("Edad obligatoria.");
+  if (!Number.isFinite(values.capnometria)) throw new Error("Capnometría obligatoria.");
+  if (!Number.isFinite(values.imc)) throw new Error("IMC obligatorio para el modelo de aprendizaje automático.");
+  if (!Number.isFinite(values.adrenalina)) throw new Error("Número de dosis de adrenalina obligatorio para el modelo de aprendizaje automático.");
 }
 
 // ===================== FEATURES PARA ML =====================
 
 function buildMLFeatures(values) {
-  if (isMid) {
-    return {
-      EDAD: values.edad,
-      SEXO: values.sexo,
-      IMC: values.imc,
-      GRUPO_SANGUINEO: values.grupoSanguineo,
-      CAUSA_FALLECIMIENTO_DANC: values.causaCardiaca,
-      CARDIOCOMPRESION_EXTRAHOSPITALARIA: values.cardioManual,
-      RECUPERACION_ALGUN_MOMENTO: values.recuperacion,
-      ADRENALINA_N: values.adrenalina,
-      COLESTEROL: values.colesterol,
-      CAPNOMETRIA_MEDIO: values.capnometria,
-      CAPNOMETRIA_MEDIO_MISSING: 0,
-      ADRENALINA_N_MISSING: 0
-    };
-  }
-
-  return {
+  const base = {
     EDAD: values.edad,
     SEXO: values.sexo,
     IMC: values.imc,
@@ -138,9 +109,21 @@ function buildMLFeatures(values) {
     RECUPERACION_ALGUN_MOMENTO: values.recuperacion,
     ADRENALINA_N: values.adrenalina,
     COLESTEROL: values.colesterol,
-    CAPNOMETRIA_TRANSFERENCIA: values.capnometria,
-    CAPNOMETRIA_TRANSFERENCIA_MISSING: 0,
     ADRENALINA_N_MISSING: 0
+  };
+
+  if (isMid) {
+    return {
+      ...base,
+      CAPNOMETRIA_MEDIO: values.capnometria,
+      CAPNOMETRIA_MEDIO_MISSING: 0
+    };
+  }
+
+  return {
+    ...base,
+    CAPNOMETRIA_TRANSFERENCIA: values.capnometria,
+    CAPNOMETRIA_TRANSFERENCIA_MISSING: 0
   };
 }
 
@@ -165,7 +148,6 @@ function calculateRulesPrediction(values) {
     corte = c.corte;
   } else {
     const c = COEFS_AFTER;
-    const tiempoMin = 0;
 
     indice =
       c.intercepto +
@@ -175,7 +157,7 @@ function calculateRulesPrediction(values) {
       values.causaCardiaca * c.causaCardiaca +
       values.cardioManual * c.cardioManual +
       values.recuperacion * c.recuperacion +
-      tiempoMin * c.tiempoLlegadaInicioPcrMin;
+      0 * c.tiempoLlegadaInicioPcrMin;
 
     corte = c.corte;
   }
@@ -211,7 +193,14 @@ async function callMLBackend(features) {
 
 // ===================== FIREBASE =====================
 
-async function savePredictionToFirebase(predictionId, values, rulesResult, mlResult, mlFeatures) {
+async function savePredictionToFirebase(
+  predictionId,
+  values,
+  rulesResult,
+  mlResult,
+  mlFeatures,
+  doctorName
+) {
   const user = auth.currentUser;
 
   const predictionMode = isMid ? "MID_RCP" : "AFTER_RCP";
@@ -222,19 +211,20 @@ async function savePredictionToFirebase(predictionId, values, rulesResult, mlRes
   const commonPrediction = {
     id: predictionId,
     source: "web",
+    schema_version: "web_fixed_v3",
 
     uid_medico: user?.uid || null,
-    nombre_medico: user?.displayName || null,
+    nombre_medico: doctorName,
 
     prediction_mode: predictionMode,
     momento_prediccion_legible: momentoLegible,
 
     edad: String(values.edad),
-    femenino: values.sexoLabel,
+    femenino: values.sexo === 1 ? "Si" : "No",
     capnometria: String(values.capnometria),
-    causa_cardiaca: values.causaCardiacaLabel,
-    cardio_manual: values.cardioManualLabel,
-    rec_pulso: values.recuperacionLabel,
+    causa_cardiaca: values.causaCardiaca === 1 ? "Si" : "No",
+    cardio_manual: values.cardioManual === 1 ? "Manual" : "Mecánica",
+    rec_pulso: values.recuperacion === 1 ? "Si" : "No",
 
     indice: Number(rulesResult.indice.toFixed(4)),
     valido: rulesResult.esValido ? "Si" : "No",
@@ -246,6 +236,10 @@ async function savePredictionToFirebase(predictionId, values, rulesResult, mlRes
     ...commonPrediction,
 
     has_ml_prediction: true,
+
+    input_values: {
+      ...values
+    },
 
     input_rules: {
       edad: values.edad,
@@ -282,11 +276,12 @@ async function savePredictionToFirebase(predictionId, values, rulesResult, mlRes
 
 // ===================== SESSION RESULT =====================
 
-function saveResultInSession(predictionId, values, rulesResult, mlResult, mlFeatures) {
+function saveResultInSession(predictionId, values, rulesResult, mlResult, mlFeatures, doctorName) {
   sessionStorage.setItem(
     "lastPredictionResult",
     JSON.stringify({
       prediction_id: predictionId,
+      doctor_name: doctorName,
       mode,
       input_values: values,
       ml_features: mlFeatures,
@@ -306,12 +301,19 @@ function saveResultInSession(predictionId, values, rulesResult, mlResult, mlFeat
 
 // ===================== INIT =====================
 
-requireRole("Médico", async () => {
+requireRole("Médico", async (user, profile) => {
+  const doctorName =
+    `${profile.name || ""} ${profile.lastname || ""}`.trim() ||
+    user.displayName ||
+    user.email ||
+    "Médico";
+
   formTitle.textContent = isMid
     ? "Formulario · Punto medio"
     : "Formulario · Transferencia";
 
   const capInput = document.getElementById("capnometria");
+
   if (capInput) {
     capInput.placeholder = isMid
       ? "Capnometría (mejor valor a los 20 min)"
@@ -342,7 +344,8 @@ requireRole("Médico", async () => {
         values,
         rulesResult,
         mlResult,
-        mlFeatures
+        mlFeatures,
+        doctorName
       );
 
       saveResultInSession(
@@ -350,7 +353,8 @@ requireRole("Médico", async () => {
         values,
         rulesResult,
         mlResult,
-        mlFeatures
+        mlFeatures,
+        doctorName
       );
 
       window.location.href = "../../html/prediction-result.html";

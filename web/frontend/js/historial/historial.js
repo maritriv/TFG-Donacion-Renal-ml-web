@@ -66,14 +66,20 @@ function isDash(value) {
 }
 
 function mapSexo(value) {
-  if (value === "Mujer" || value === "Si" || value === "Sí") return "M";
-  if (value === "Hombre" || value === "No") return "H";
+  if (value === "Mujer" || value === "Si" || value === "Sí") return "Mujer";
+  if (value === "Hombre" || value === "No") return "Hombre";
   return dash(value);
 }
 
 function mapSexoPdf(value) {
   if (value === "Mujer" || value === "Si" || value === "Sí") return "Femenino";
   if (value === "Hombre" || value === "No") return "Masculino";
+  return dash(value);
+}
+
+function mapCardio(value) {
+  if (value === "Manual" || value === "Si" || value === "Sí") return "Si";
+  if (value === "Mecánica" || value === "Mecanica" || value === "No") return "No";
   return dash(value);
 }
 
@@ -788,10 +794,10 @@ function exportPredictionsCsv(predictions) {
   const headers = [
     "ID",
     "Edad",
-    "Sexo",
+    "Femenino",
     "Capnometria",
     "Causa_cardiaca",
-    "Cardiocompresion",
+    "Cardio_manual",
     "Recuperacion_pulso",
     "Prediction_mode",
     "Momento",
@@ -800,7 +806,7 @@ function exportPredictionsCsv(predictions) {
     "Adrenalina",
     "Colesterol",
     "Resultado_reglas",
-    "Indice_reglas",
+    "Indice",
     "Resultado_ML",
     "Probabilidad_ML",
     "ML_dataset",
@@ -842,9 +848,9 @@ function exportPredictionsCsv(predictions) {
     return [
       prediction.id,
       prediction.edad,
-      mapSexo(prediction.femenino),
+      prediction.femenino,
       prediction.capnometria,
-      prediction.causa_cardiaca,
+      mapCardio(prediction.causa_cardiaca),
       prediction.cardio_manual,
       prediction.rec_pulso,
       prediction.prediction_mode,

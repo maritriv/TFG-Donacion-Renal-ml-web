@@ -27,9 +27,17 @@ const btnGoPredictionMode = document.getElementById("btn-go-prediction-mode");
 
 const btnGoHistorial = document.getElementById("btn-go-historial-medico");
 
+const btnGoImport = document.getElementById("btn-import");
+
 if (btnGoHistorial) {
   btnGoHistorial.addEventListener("click", () => {
     window.location.href = "../../html/historial.html?scope=medico";
+  });
+}
+
+if (btnGoImport) {
+  btnGoImport.addEventListener("click", () => {
+    window.location.href = "../../html/import.html";
   });
 }
 
