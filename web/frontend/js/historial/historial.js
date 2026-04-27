@@ -15,11 +15,54 @@ const historialCount = document.getElementById("historial-count");
 const historialEmpty = document.getElementById("historial-empty");
 const tableBody = document.getElementById("historial-table-body");
 
+const btnSort = document.getElementById("btn-sort");
+const sortModalOverlay = document.getElementById("sort-modal-overlay");
+const sortSelect = document.getElementById("sort-select");
+const btnSortCancel = document.getElementById("btn-sort-cancel");
+const btnSortApply = document.getElementById("btn-sort-apply");
+
+let currentPredictions = [];
+
+const btnFilter = document.getElementById("btn-filter");
+const filterModalOverlay = document.getElementById("filter-modal-overlay");
+
+const filterEdadMin = document.getElementById("filter-edad-min");
+const filterEdadMax = document.getElementById("filter-edad-max");
+const filterSexo = document.getElementById("filter-sexo");
+const filterCapnoMin = document.getElementById("filter-capno-min");
+const filterCapnoMax = document.getElementById("filter-capno-max");
+const filterCausa = document.getElementById("filter-causa");
+const filterCardio = document.getElementById("filter-cardio");
+const filterRec = document.getElementById("filter-rec");
+const filterResultado = document.getElementById("filter-resultado");
+const filterImcMin = document.getElementById("filter-imc-min");
+const filterImcMax = document.getElementById("filter-imc-max");
+const filterGrupo = document.getElementById("filter-grupo");
+const filterAdrenalinaMin = document.getElementById("filter-adrenalina-min");
+const filterAdrenalinaMax = document.getElementById("filter-adrenalina-max");
+const filterColesterol = document.getElementById("filter-colesterol");
+
+const btnFilterClear = document.getElementById("btn-filter-clear");
+const btnFilterCancel = document.getElementById("btn-filter-cancel");
+const btnFilterApply = document.getElementById("btn-filter-apply");
+
+let allPredictions = [];
+
+const btnExport = document.getElementById("btn-export");
+
+let displayedPredictions = [];
+
 const params = new URLSearchParams(window.location.search);
 const scope = params.get("scope") || "medico";
 
+// ===================== HELPERS =====================
+
 function dash(value) {
   return value === null || value === undefined || value === "" ? "—" : value;
+}
+
+function isDash(value) {
+  return value === null || value === undefined || value === "" || value === "—";
 }
 
 function mapSexo(value) {
@@ -39,7 +82,7 @@ function mapResultado(value) {
 }
 
 function mapGrupoSanguineo(value) {
-  if (value === null || value === undefined || value === "" || value === "—") return "—";
+  if (isDash(value)) return "—";
 
   const normalized = String(value).trim().toUpperCase();
 
@@ -58,7 +101,7 @@ function mapGrupoSanguineo(value) {
 }
 
 function mapColesterol(value) {
-  if (value === null || value === undefined || value === "" || value === "—") return "—";
+  if (isDash(value)) return "—";
 
   const normalized = String(value).trim();
 
@@ -69,7 +112,7 @@ function mapColesterol(value) {
 }
 
 function formatIndice(value) {
-  if (value === null || value === undefined || value === "") return "—";
+  if (isDash(value)) return "—";
   return Number(value).toFixed(3);
 }
 
@@ -102,6 +145,7 @@ function cleanFileName(value) {
 function formatDateForFile() {
   const now = new Date();
   const pad = (n) => String(n).padStart(2, "0");
+
   return `${pad(now.getDate())}-${pad(now.getMonth() + 1)}-${now.getFullYear()}_${pad(now.getHours())}-${pad(now.getMinutes())}`;
 }
 
@@ -114,8 +158,88 @@ function safePercent(probability) {
   if (probability === null || probability === undefined || Number.isNaN(Number(probability))) {
     return "No disponible";
   }
+
   return `${(Number(probability) * 100).toFixed(2)}%`;
 }
+
+// ===================== SORT =====================
+
+function getSortValue(prediction, sortBy) {
+  if (sortBy === "edad") {
+    return dash(prediction.edad);
+  }
+
+  if (sortBy === "capnometria") {
+    return dash(prediction.capnometria);
+  }
+
+  if (sortBy === "momento") {
+    return modeToLabel(
+      prediction.prediction_mode,
+      prediction.momento_prediccion_legible
+    );
+  }
+
+  if (sortBy === "indice") {
+    return dash(prediction.indice);
+  }
+
+  if (sortBy === "imc") {
+    return getExtraValue(prediction, "imc", "IMC");
+  }
+
+  if (sortBy === "adrenalina") {
+    return getExtraValue(prediction, "adrenalina", "ADRENALINA_N");
+  }
+
+  return "—";
+}
+
+function normalizeValue(value) {
+  if (isDash(value)) return null;
+
+  const number = Number(value);
+  if (Number.isFinite(number)) return number;
+
+  return String(value).toLowerCase();
+}
+
+function sortPredictions(predictions, sortBy) {
+  return [...predictions].sort((a, b) => {
+    const rawA = getSortValue(a, sortBy);
+    const rawB = getSortValue(b, sortBy);
+
+    const dashA = isDash(rawA);
+    const dashB = isDash(rawB);
+
+    if (dashA && !dashB) return 1;
+    if (!dashA && dashB) return -1;
+    if (dashA && dashB) return 0;
+
+    const valueA = normalizeValue(rawA);
+    const valueB = normalizeValue(rawB);
+
+    if (typeof valueA === "number" && typeof valueB === "number") {
+      return valueA - valueB;
+    }
+
+    return String(valueA).localeCompare(String(valueB), "es");
+  });
+}
+
+function openSortModal() {
+  if (sortModalOverlay) {
+    sortModalOverlay.hidden = false;
+  }
+}
+
+function closeSortModal() {
+  if (sortModalOverlay) {
+    sortModalOverlay.hidden = true;
+  }
+}
+
+// ===================== DOCTOR NAME =====================
 
 async function getDoctorNameByUid(uid, fallback = "Profesional sanitario") {
   if (!uid) return fallback;
@@ -137,6 +261,8 @@ async function getDoctorNameByUid(uid, fallback = "Profesional sanitario") {
     return fallback;
   }
 }
+
+// ===================== PDF =====================
 
 function generatePredictionPdfFromHistorial(basePrediction, mlPrediction = null) {
   const { jsPDF } = window.jspdf;
@@ -286,18 +412,8 @@ function generatePredictionPdfFromHistorial(basePrediction, mlPrediction = null)
 
 async function downloadPredictionPdf(prediction) {
   try {
-    const fallbackName =
-      prediction.nombre_medico ||
-      auth.currentUser?.displayName ||
-      "Profesional sanitario";
-
-    const doctorName = await getDoctorNameByUid(prediction.uid_medico, fallbackName);
-
     generatePredictionPdfFromHistorial(
-      {
-        ...prediction,
-        nombre_medico_pdf: doctorName
-      },
+      prediction,
       prediction.ml_prediction || null
     );
   } catch (error) {
@@ -306,7 +422,11 @@ async function downloadPredictionPdf(prediction) {
   }
 }
 
+// ===================== TABLE =====================
+
 function renderPredictions(predictions) {
+  displayedPredictions = predictions;
+
   tableBody.innerHTML = "";
   historialCount.textContent = `Mostrando ${predictions.length} filas`;
 
@@ -367,6 +487,8 @@ function renderPredictions(predictions) {
   });
 }
 
+// ===================== FIREBASE =====================
+
 async function loadMlPredictionsById() {
   const snapshot = await getDocs(collection(db, "predicciones_ml"));
   const map = new Map();
@@ -408,17 +530,30 @@ async function loadPredictions() {
     loadMlPredictionsById()
   ]);
 
-  const predictions = snapshot.docs.map((documentSnapshot) => {
-    const basePrediction = {
-      id: documentSnapshot.id,
-      ...documentSnapshot.data()
-    };
+  const predictions = await Promise.all(
+    snapshot.docs.map(async (documentSnapshot) => {
+        const basePrediction = {
+            id: documentSnapshot.id,
+            ...documentSnapshot.data()
+        };
 
-    return {
-      ...basePrediction,
-      ml_prediction: mlMap.get(documentSnapshot.id) || null
-    };
-  });
+        const fallbackName =
+            basePrediction.nombre_medico ||
+            auth.currentUser?.displayName ||
+            "Profesional sanitario";
+
+        const doctorName = await getDoctorNameByUid(
+            basePrediction.uid_medico,
+            fallbackName
+            );
+
+        return {
+            ...basePrediction,
+            nombre_medico_pdf: doctorName,
+            ml_prediction: mlMap.get(documentSnapshot.id) || null
+        };
+    })
+  );
 
   predictions.sort((a, b) => {
     const dateA = a.fecha?.toMillis?.() || 0;
@@ -426,8 +561,12 @@ async function loadPredictions() {
     return dateB - dateA;
   });
 
+  allPredictions = predictions;
+  currentPredictions = predictions;
   renderPredictions(predictions);
 }
+
+// ===================== INIT =====================
 
 requireRole("Médico", async () => {
   if (btnBack) {
@@ -436,5 +575,322 @@ requireRole("Médico", async () => {
     });
   }
 
+  if (btnSort) {
+    btnSort.addEventListener("click", openSortModal);
+  }
+
+  if (btnSortCancel) {
+    btnSortCancel.addEventListener("click", closeSortModal);
+  }
+
+  if (btnSortApply) {
+    btnSortApply.addEventListener("click", () => {
+      const sortedPredictions = sortPredictions(currentPredictions, sortSelect.value);
+      currentPredictions = sortedPredictions;
+      renderPredictions(sortedPredictions);
+      closeSortModal();
+    });
+  }
+
+  if (btnFilter) {
+    btnFilter.addEventListener("click", openFilterModal);
+  }
+
+  if (btnFilterCancel) {
+    btnFilterCancel.addEventListener("click", closeFilterModal);
+  }
+
+  if (btnFilterApply) {
+    btnFilterApply.addEventListener("click", applyFilters);
+  }
+
+  if (btnFilterClear) {
+    btnFilterClear.addEventListener("click", clearFilters);
+  }
+
+  if (btnExport) {
+    btnExport.addEventListener("click", () => {
+        exportPredictionsCsv(displayedPredictions);
+    });
+  }
+
   await loadPredictions();
 });
+
+function openFilterModal() {
+  filterModalOverlay.hidden = false;
+}
+
+function closeFilterModal() {
+  filterModalOverlay.hidden = true;
+}
+
+function toNumberOrNull(value) {
+  if (value === null || value === undefined || value === "") return null;
+
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
+
+function normalizeSiNo(value) {
+  if (value === "Sí") return "Si";
+  return value || "";
+}
+
+function matchesRange(value, min, max) {
+  const numericValue = toNumberOrNull(value);
+
+  if (numericValue === null) return false;
+  if (min !== null && numericValue < min) return false;
+  if (max !== null && numericValue > max) return false;
+
+  return true;
+}
+
+function predictionMatchesFilters(prediction) {
+  const edadMin = toNumberOrNull(filterEdadMin.value);
+  const edadMax = toNumberOrNull(filterEdadMax.value);
+  const capnoMin = toNumberOrNull(filterCapnoMin.value);
+  const capnoMax = toNumberOrNull(filterCapnoMax.value);
+  const imcMin = toNumberOrNull(filterImcMin.value);
+  const imcMax = toNumberOrNull(filterImcMax.value);
+  const adrenalinaMin = toNumberOrNull(filterAdrenalinaMin.value);
+  const adrenalinaMax = toNumberOrNull(filterAdrenalinaMax.value);
+
+  const imc = getExtraValue(prediction, "imc", "IMC");
+  const grupo = mapGrupoSanguineo(
+    getExtraValue(prediction, "grupoSanguineoLabel", "GRUPO_SANGUINEO")
+  );
+  const adrenalina = getExtraValue(prediction, "adrenalina", "ADRENALINA_N");
+  const colesterol = mapColesterol(
+    getExtraValue(prediction, "colesterolLabel", "COLESTEROL")
+  );
+
+if ((imcMin !== null || imcMax !== null) && !matchesRange(imc, imcMin, imcMax)) {
+  return false;
+}
+
+if (filterGrupo.value && grupo !== filterGrupo.value) {
+  return false;
+}
+
+if ((adrenalinaMin !== null || adrenalinaMax !== null) && !matchesRange(adrenalina, adrenalinaMin, adrenalinaMax)) {
+  return false;
+}
+
+if (filterColesterol.value && colesterol !== filterColesterol.value) {
+  return false;
+}
+
+  if ((edadMin !== null || edadMax !== null) && !matchesRange(prediction.edad, edadMin, edadMax)) {
+    return false;
+  }
+
+  if (filterSexo.value && mapSexo(prediction.femenino) !== filterSexo.value) {
+    return false;
+  }
+
+  if ((capnoMin !== null || capnoMax !== null) && !matchesRange(prediction.capnometria, capnoMin, capnoMax)) {
+    return false;
+  }
+
+  if (filterCausa.value && normalizeSiNo(prediction.causa_cardiaca) !== filterCausa.value) {
+    return false;
+  }
+
+  if (filterCardio.value && prediction.cardio_manual !== filterCardio.value) {
+    return false;
+  }
+
+  if (filterRec.value && normalizeSiNo(prediction.rec_pulso) !== filterRec.value) {
+    return false;
+  }
+
+  if (filterResultado.value && normalizeSiNo(prediction.valido) !== filterResultado.value) {
+    return false;
+  }
+
+  return true;
+}
+
+function applyFilters() {
+  const filteredPredictions = allPredictions.filter(predictionMatchesFilters);
+
+  currentPredictions = filteredPredictions;
+  renderPredictions(filteredPredictions);
+  closeFilterModal();
+}
+
+function clearFilters() {
+  filterEdadMin.value = "";
+  filterEdadMax.value = "";
+  filterSexo.value = "";
+  filterCapnoMin.value = "";
+  filterCapnoMax.value = "";
+  filterCausa.value = "";
+  filterCardio.value = "";
+  filterRec.value = "";
+  filterResultado.value = "";
+  filterImcMin.value = "";
+  filterImcMax.value = "";
+  filterGrupo.value = "";
+  filterAdrenalinaMin.value = "";
+  filterAdrenalinaMax.value = "";
+  filterColesterol.value = "";
+
+  currentPredictions = allPredictions;
+  renderPredictions(allPredictions);
+  closeFilterModal();
+}
+
+function stripAccents(value) {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function csvValue(value) {
+  const raw = stripAccents(value)
+    .replace(/\r/g, " ")
+    .replace(/\n/g, " ")
+    .trim();
+
+  if (raw.includes(",") || raw.includes('"')) {
+    return `"${raw.replace(/"/g, '""')}"`;
+  }
+
+  return raw;
+}
+
+function formatCsvDate(timestamp) {
+  if (timestamp?.toDate) {
+    return timestamp.toDate().toLocaleString("es-ES");
+  }
+
+  return "";
+}
+
+function getMlPredictionLabel(mlPrediction) {
+  if (!mlPrediction?.ml_result) return "—";
+
+  const mlResult = mlPrediction.ml_result;
+  const isValid = Number(mlResult.prediction) === 1 || mlResult.label_legible === "Si";
+
+  return isValid ? "Valido" : "No valido";
+}
+
+function exportPredictionsCsv(predictions) {
+  if (!predictions.length) {
+    alert("No hay predicciones para exportar.");
+    return;
+  }
+
+  const headers = [
+    "ID",
+    "Edad",
+    "Sexo",
+    "Capnometria",
+    "Causa_cardiaca",
+    "Cardiocompresion",
+    "Recuperacion_pulso",
+    "Prediction_mode",
+    "Momento",
+    "IMC",
+    "Grupo_sanguineo",
+    "Adrenalina",
+    "Colesterol",
+    "Resultado_reglas",
+    "Indice_reglas",
+    "Resultado_ML",
+    "Probabilidad_ML",
+    "ML_dataset",
+    "ML_modelo",
+    "ML_experimento",
+    "ML_seed",
+    "ML_version",
+    "UID_medico",
+    "Nombre_medico",
+    "Fecha"
+  ];
+
+  const rows = predictions.map((prediction) => {
+    const mlPrediction = prediction.ml_prediction || null;
+    const inputValues = mlPrediction?.input_values || {};
+    const inputMl = mlPrediction?.input_ml || {};
+    const mlResult = mlPrediction?.ml_result || {};
+    const modelInfo = mlPrediction?.model_info || {};
+
+    const momento = modeToLabel(
+      prediction.prediction_mode,
+      prediction.momento_prediccion_legible
+    );
+
+    const imc = inputValues.imc ?? inputMl.IMC ?? "";
+    const grupo = mapGrupoSanguineo(
+      inputValues.grupoSanguineoLabel ?? inputMl.GRUPO_SANGUINEO
+    );
+    const adrenalina = inputValues.adrenalina ?? inputMl.ADRENALINA_N ?? "";
+    const colesterol = mapColesterol(
+      inputValues.colesterolLabel ?? inputMl.COLESTEROL
+    );
+
+    const probability =
+      mlResult.probability !== null && mlResult.probability !== undefined
+        ? Number(mlResult.probability).toFixed(4)
+        : "";
+
+    return [
+      prediction.id,
+      prediction.edad,
+      mapSexo(prediction.femenino),
+      prediction.capnometria,
+      prediction.causa_cardiaca,
+      prediction.cardio_manual,
+      prediction.rec_pulso,
+      prediction.prediction_mode,
+      momento,
+      imc,
+      grupo,
+      adrenalina,
+      colesterol,
+      mapResultado(prediction.valido),
+      formatIndice(prediction.indice),
+      getMlPredictionLabel(mlPrediction),
+      probability,
+      modelInfo.dataset,
+      modelInfo.model,
+      modelInfo.experiment,
+      modelInfo.seed,
+      modelInfo.version_modelo,
+      prediction.uid_medico,
+      prediction.nombre_medico_pdf || prediction.nombre_medico,
+      formatCsvDate(prediction.fecha)
+    ].map(csvValue).join(",");
+  });
+
+  const csvContent = [headers.join(","), ...rows].join("\n");
+
+  const blob = new Blob(["\uFEFF" + csvContent], {
+    type: "text/csv;charset=utf-8;"
+  });
+
+  const url = URL.createObjectURL(blob);
+
+  const now = new Date();
+  const doctorName =
+    predictions[0]?.nombre_medico_pdf ||
+    predictions[0]?.nombre_medico ||
+    "medico";
+
+  const fileName = `predicciones_${cleanFileName(doctorName)}_${formatDateForFile()}.csv`;
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+}
+

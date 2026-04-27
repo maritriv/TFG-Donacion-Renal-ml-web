@@ -7,6 +7,7 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../css/responsive/media.css">
 </head>
 
 <body>
@@ -25,9 +26,9 @@
           <div class="historial-actions-row">
             <span id="historial-count">Mostrando 0 filas</span>
 
-            <button type="button" class="historial-action-btn">Ordenar</button>
-            <button type="button" class="historial-action-btn">Filtrar</button>
-            <button type="button" class="historial-action-btn">Exportar</button>
+            <button type="button" id="btn-sort" class="historial-action-btn">Ordenar</button>
+            <button type="button" id="btn-filter" class="historial-action-btn">Filtrar</button>
+            <button type="button" id="btn-export" class="historial-action-btn">Exportar</button>
           </div>
         </div>
 
@@ -63,6 +64,140 @@
       </section>
     </main>
   </section>
+
+  <div id="sort-modal-overlay" class="historial-modal-overlay" hidden>
+    <div class="historial-modal">
+      <h2>Ordenar predicciones por</h2>
+
+      <div class="historial-modal-select-wrapper">
+        <select id="sort-select">
+          <option value="edad">Edad</option>
+          <option value="capnometria">Capnometría</option>
+          <option value="momento">Momento</option>
+          <option value="indice">Índice</option>
+          <option value="imc">IMC</option>
+          <option value="adrenalina">Adrenalina</option>
+        </select>
+      </div>
+
+      <div class="historial-modal-actions">
+        <button type="button" id="btn-sort-cancel">Cancelar</button>
+        <button type="button" id="btn-sort-apply">Aplicar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="filter-modal-overlay" class="historial-modal-overlay" hidden>
+    <div class="historial-modal historial-filter-modal">
+      <h2>Filtrar predicciones</h2>
+
+      <div class="filter-grid">
+        <div class="filter-field">
+          <label>Edad</label>
+          <div class="filter-row">
+            <input id="filter-edad-min" type="number" placeholder="Mín.">
+            <input id="filter-edad-max" type="number" placeholder="Máx.">
+          </div>
+        </div>
+
+        <div class="filter-field">
+          <label>Sexo</label>
+          <select id="filter-sexo">
+            <option value="">Cualquiera</option>
+            <option value="H">Hombre</option>
+            <option value="M">Mujer</option>
+          </select>
+        </div>
+
+        <div class="filter-field">
+          <label>Capnometría</label>
+          <div class="filter-row">
+            <input id="filter-capno-min" type="number" placeholder="Mín.">
+            <input id="filter-capno-max" type="number" placeholder="Máx.">
+          </div>
+        </div>
+
+        <div class="filter-field">
+          <label>Causa cardíaca</label>
+          <select id="filter-causa">
+            <option value="">Cualquiera</option>
+            <option value="Si">Sí</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+
+        <div class="filter-field">
+          <label>Cardiocompresión manual</label>
+          <select id="filter-cardio">
+            <option value="">Cualquiera</option>
+            <option value="Manual">Manual</option>
+            <option value="Mecánica">Mecánica</option>
+          </select>
+        </div>
+
+        <div class="filter-field">
+          <label>Recuperación pulso</label>
+          <select id="filter-rec">
+            <option value="">Cualquiera</option>
+            <option value="Si">Sí</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+
+        <div class="filter-field">
+          <label>Resultado</label>
+          <select id="filter-resultado">
+            <option value="">Cualquiera</option>
+            <option value="Si">Válido</option>
+            <option value="No">No válido</option>
+          </select>
+        </div>
+
+        <div class="filter-field">
+            <label>IMC</label>
+            <div class="filter-row">
+                <input id="filter-imc-min" type="number" step="0.01" placeholder="Mín.">
+                <input id="filter-imc-max" type="number" step="0.01" placeholder="Máx.">
+            </div>
+        </div>
+
+        <div class="filter-field">
+            <label>Grupo sanguíneo</label>
+            <select id="filter-grupo">
+                <option value="">Cualquiera</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="AB">AB</option>
+                <option value="O">O</option>
+            </select>
+        </div>
+
+        <div class="filter-field">
+            <label>Adrenalina</label>
+            <div class="filter-row">
+                <input id="filter-adrenalina-min" type="number" placeholder="Mín.">
+                <input id="filter-adrenalina-max" type="number" placeholder="Máx.">
+            </div>
+        </div>
+
+        <div class="filter-field">
+            <label>Colesterol</label>
+            <select id="filter-colesterol">
+                <option value="">Cualquiera</option>
+                <option value="No">No</option>
+                <option value="Sí">Sí</option>
+            </select>
+        </div>
+
+      </div>
+
+      <div class="historial-modal-actions">
+        <button type="button" id="btn-filter-clear">Limpiar</button>
+        <button type="button" id="btn-filter-cancel">Cancelar</button>
+        <button type="button" id="btn-filter-apply">Aplicar</button>
+      </div>
+    </div>
+  </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script type="module" src="../js/historial/historial.js"></script>
