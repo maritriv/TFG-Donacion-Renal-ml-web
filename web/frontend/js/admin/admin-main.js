@@ -178,11 +178,11 @@ logoutBtn.addEventListener("click", handleLogout);
 drawerLogoutBtn.addEventListener("click", handleLogout);
 
 btnViewUsers.addEventListener("click", () => {
-  console.log("Botón VER USUARIOS pendiente de implementar");
+  window.location.href = "../../html/admin-users.html";
 });
 
 btnViewPredictions.addEventListener("click", () => {
-  console.log("Botón VER PREDICCIONES pendiente de implementar");
+  window.location.href = "../../html/historial.html?scope=admin";
 });
 
 requireRole("Administrador", async (user, profile) => {

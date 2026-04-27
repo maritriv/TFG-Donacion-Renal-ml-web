@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ver usuarios</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../css/pages/admin-users.css">
+  <link rel="stylesheet" href="../css/responsive/media.css">
+</head>
+
+<body>
+  <section class="admin-users-page">
+    <button type="button" id="btn-back" class="back admin-users-back">← Volver</button>
+
+    <div class="admin-users-container">
+      <div class="user-type-switch">
+        <button type="button" id="btn-medicos" class="user-type-option active">
+          MÉDICOS
+        </button>
+
+        <button type="button" id="btn-admins" class="user-type-option">
+          ADMINISTRADORES
+        </button>
+      </div>
+
+      <h1 id="users-title">MÉDICOS</h1>
+
+      <input
+        id="search-input"
+        class="admin-users-search"
+        type="text"
+        placeholder="Buscar usuario (nombre, apellidos o email)"
+      />
+
+      <div id="users-list" class="users-list"></div>
+
+      <p id="users-empty" class="users-empty" hidden>
+        No hay usuarios para mostrar.
+      </p>
+    </div>
+  </section>
+
+  <script type="module" src="../js/admin/admin-users.js"></script>
+</body>
+</html>

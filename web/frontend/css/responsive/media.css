@@ -199,3 +199,45 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 700px) {
+  .admin-users-page {
+    padding: 18px 16px;
+  }
+
+  .user-type-switch {
+    height: 50px;
+  }
+
+  .user-type-option {
+    font-size: 16px;
+  }
+
+  #users-title {
+    font-size: 34px;
+  }
+
+  .admin-users-search {
+    height: 52px;
+    font-size: 16px;
+  }
+
+  .user-card {
+    grid-template-columns: 48px 1fr auto;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .user-name {
+    font-size: 16px;
+  }
+
+  .user-email {
+    font-size: 14px;
+  }
+
+  .user-status {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}

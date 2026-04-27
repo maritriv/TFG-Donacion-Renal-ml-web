@@ -77,12 +77,6 @@ function mapSexoPdf(value) {
   return dash(value);
 }
 
-function mapCardio(value) {
-  if (value === "Manual" || value === "Si" || value === "Sí") return "Si";
-  if (value === "Mecánica" || value === "Mecanica" || value === "No") return "No";
-  return dash(value);
-}
-
 function mapResultado(value) {
   return value === "Si" || value === "Sí" ? "Válido" : "No válido";
 }
@@ -574,10 +568,12 @@ async function loadPredictions() {
 
 // ===================== INIT =====================
 
-requireRole("Médico", async () => {
+const requiredRole = scope === "admin" ? "Administrador" : "Médico";
+
+requireRole(requiredRole, async () => {
   if (btnBack) {
     btnBack.addEventListener("click", () => {
-      window.location.href = "../../html/medico.html";
+        window.location.href = "../../html/medico.html";
     });
   }
 
@@ -850,7 +846,7 @@ function exportPredictionsCsv(predictions) {
       prediction.edad,
       prediction.femenino,
       prediction.capnometria,
-      mapCardio(prediction.causa_cardiaca),
+      prediction.causa_cardiaca,
       prediction.cardio_manual,
       prediction.rec_pulso,
       prediction.prediction_mode,
@@ -883,12 +879,18 @@ function exportPredictionsCsv(predictions) {
   const url = URL.createObjectURL(blob);
 
   const now = new Date();
-  const doctorName =
-    predictions[0]?.nombre_medico_pdf ||
-    predictions[0]?.nombre_medico ||
-    "medico";
+  let fileName;
 
-  const fileName = `predicciones_${cleanFileName(doctorName)}_${formatDateForFile()}.csv`;
+  if (scope === "admin") {
+    fileName = `predicciones_globales_${formatDateForFile()}.csv`;
+  } else {
+    const doctorName =
+        predictions[0]?.nombre_medico_pdf ||
+        predictions[0]?.nombre_medico ||
+        "medico";
+
+    fileName = `predicciones_${cleanFileName(doctorName)}_${formatDateForFile()}.csv`;
+  }
 
   const link = document.createElement("a");
   link.href = url;
