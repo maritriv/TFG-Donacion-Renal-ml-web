@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Historial de predicciones</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+
+<body>
+  <section id="historial-view" class="view active">
+    <button type="button" id="btn-back" class="back historial-back">← Volver</button>
+
+    <header class="historial-header">
+      <h1 id="historial-title">HISTORIAL PREDICCIONES</h1>
+    </header>
+
+    <main class="historial-content">
+      <section class="historial-card">
+        <div class="historial-card-top">
+          <h2>PREDICCIONES</h2>
+
+          <div class="historial-actions-row">
+            <span id="historial-count">Mostrando 0 filas</span>
+
+            <button type="button" class="historial-action-btn">Ordenar</button>
+            <button type="button" class="historial-action-btn">Filtrar</button>
+            <button type="button" class="historial-action-btn">Exportar</button>
+          </div>
+        </div>
+
+        <p id="historial-empty" class="historial-empty" hidden>
+          No hay predicciones registradas.
+        </p>
+
+        <div class="historial-table-wrapper">
+          <table class="historial-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Edad</th>
+                <th>Sexo</th>
+                <th>Capnometría</th>
+                <th>Causa cardíaca</th>
+                <th>Cardiocompresión</th>
+                <th>Rec. del pulso</th>
+                <th>Momento</th>
+                <th>IMC</th>
+                <th>Grupo sanguíneo</th>
+                <th>Adrenalina</th>
+                <th>Colesterol</th>
+                <th>Resultado</th>
+                <th>Índice</th>
+                <th>Informe</th>
+              </tr>
+            </thead>
+
+            <tbody id="historial-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script type="module" src="../js/historial/historial.js"></script>
+</body>
+</html>

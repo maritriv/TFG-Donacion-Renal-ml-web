@@ -25,6 +25,14 @@ const drawerEditProfileBtn = document.getElementById("drawer-edit-profile-btn");
 
 const btnGoPredictionMode = document.getElementById("btn-go-prediction-mode");
 
+const btnGoHistorial = document.getElementById("btn-go-historial-medico");
+
+if (btnGoHistorial) {
+  btnGoHistorial.addEventListener("click", () => {
+    window.location.href = "../../html/historial.html?scope=medico";
+  });
+}
+
 let currentUser = null;
 
 function calcularPorcentaje(parte, total) {
