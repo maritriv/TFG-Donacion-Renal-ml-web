@@ -84,7 +84,11 @@ function renderUsers() {
     `;
 
     card.addEventListener("click", () => {
-      window.location.href = `../../html/admin-profile.html?userId=${user.id}`;
+      if (user.role === "Médico") {
+        window.location.href = `../../html/medical-profile.html?userId=${user.id}`;
+      } else {
+        window.location.href = `../../html/admin-profile.html?userId=${user.id}`;
+      }
     });
 
     usersList.appendChild(card);

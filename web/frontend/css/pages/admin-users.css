@@ -109,6 +109,7 @@
   gap: 12px;
   padding: 12px;
   margin: 0 4px;
+  cursor: pointer;
 }
 
 .user-icon {
@@ -147,6 +148,10 @@
   font-weight: 800;
 }
 
+.user-status.inactive {
+  background: #e56f66;
+}
+
 .users-empty {
   text-align: center;
   color: #9ca3af;
@@ -178,7 +183,8 @@
   font-weight: 800;
 }
 
-.admin-profile-content {
+.admin-profile-content,
+.medical-profile-content {
   width: min(760px, 92vw);
   margin: 38px auto 0;
 }
@@ -210,11 +216,9 @@
   font-size: 22px;
   font-weight: 800;
   outline: none;
-
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
-
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -230,7 +234,7 @@
 .admin-profile-actions {
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 18px;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -249,12 +253,6 @@
   border-radius: 999px;
   padding: 8px 18px;
   background: #ffffff;
-}
-
-.admin-profile-actions {
-  display: flex;
-  align-items: center;
-  gap: 18px;
 }
 
 .profile-status {
@@ -352,10 +350,66 @@
   font-size: 18px;
 }
 
-.user-card {
-  cursor: pointer;
+/* PERFIL MÉDICO */
+
+.medical-profile-page {
+  height: 100vh;
+  background: #f6f7f4;
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.user-status.inactive {
-  background: #e56f66;
+.medical-profile-page .admin-profile-back {
+  flex: 0 0 auto;
+  margin: 0 0 16px 28px;
+  padding: 0;
+  background: #f6f7f4;
+}
+
+.medical-profile-page .admin-profile-header {
+  flex: 0 0 auto;
+}
+
+.medical-profile-content {
+  flex: 1;
+  min-height: 0;
+  padding-bottom: 40px;
+  overflow-y: auto;
+}
+
+.medical-predictions-card {
+  width: 100%;
+  min-height: 430px;
+  height: auto;
+  margin-top: 40px;
+}
+
+.medical-predictions-card .historial-table-wrapper {
+  max-height: 330px;
+  overflow: auto;
+}
+
+
+.medical-predictions-card .historial-table {
+  min-width: 1650px; 
+}
+
+.medical-profile-page .admin-profile-back {
+  width: auto;
+  align-self: flex-start;
+  margin: 0 0 16px 28px;
+  padding: 0;
+  text-align: left;
+}
+
+.medical-profile-page .admin-profile-back a,
+.medical-profile-page .admin-profile-back button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: auto;
+  margin: 0;
+  text-align: left;
 }
