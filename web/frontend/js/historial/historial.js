@@ -114,7 +114,7 @@ function formatIndice(value) {
 
 function modeToLabel(mode, fallback) {
   if (mode === "MID_RCP") return "Mitad del procedimiento de RCP (20 min)";
-  if (mode === "AFTER_RCP") return "Después del procedimiento de RCP";
+  if (mode === "AFTER_RCP") return "Transferencia hospitalaria";
   return fallback || "—";
 }
 
