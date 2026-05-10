@@ -1,11 +1,11 @@
 {
   "fold_metrics": [
     {
-      "accuracy": 0.8333333333333334,
-      "balanced_accuracy": 0.875,
-      "precision": 0.6666666666666666,
+      "accuracy": 1.0,
+      "balanced_accuracy": 1.0,
+      "precision": 1.0,
       "recall": 1.0,
-      "f1": 0.8,
+      "f1": 1.0,
       "roc_auc": 1.0,
       "fold": 1
     },
@@ -29,10 +29,10 @@
     },
     {
       "accuracy": 0.8333333333333334,
-      "balanced_accuracy": 0.875,
-      "precision": 0.6666666666666666,
-      "recall": 1.0,
-      "f1": 0.8,
+      "balanced_accuracy": 0.75,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6666666666666666,
       "roc_auc": 0.875,
       "fold": 4
     },
@@ -42,7 +42,7 @@
       "precision": 0.5,
       "recall": 0.5,
       "f1": 0.5,
-      "roc_auc": 0.875,
+      "roc_auc": 0.75,
       "fold": 5
     },
     {
@@ -60,7 +60,7 @@
       "precision": 1.0,
       "recall": 0.5,
       "f1": 0.6666666666666666,
-      "roc_auc": 1.0,
+      "roc_auc": 0.6666666666666667,
       "fold": 7
     },
     {
@@ -87,20 +87,20 @@
       "precision": 0.3333333333333333,
       "recall": 0.5,
       "f1": 0.4,
-      "roc_auc": 0.5,
+      "roc_auc": 0.6666666666666667,
       "fold": 10
     }
   ],
-  "accuracy_mean": 0.7366666666666667,
-  "accuracy_std": 0.18586135812600865,
+  "accuracy_mean": 0.7533333333333333,
+  "accuracy_std": 0.20066555924389884,
   "balanced_accuracy_mean": 0.7291666666666667,
-  "balanced_accuracy_std": 0.2009093908540199,
-  "precision_mean": 0.6166666666666666,
-  "precision_std": 0.3077697552103231,
-  "recall_mean": 0.6833333333333333,
-  "recall_std": 0.34520525295346627,
-  "f1_mean": 0.6233333333333333,
-  "f1_std": 0.2921377148614065,
-  "roc_auc_mean": 0.8166666666666668,
-  "roc_auc_std": 0.1920286436967152
+  "balanced_accuracy_std": 0.20854156260403664,
+  "precision_mean": 0.6833333333333333,
+  "precision_std": 0.3452052529534663,
+  "recall_mean": 0.6333333333333333,
+  "recall_std": 0.33166247903553997,
+  "f1_mean": 0.63,
+  "f1_std": 0.30566866593312003,
+  "roc_auc_mean": 0.7875000000000001,
+  "roc_auc_std": 0.16504418600281964
 }

@@ -224,7 +224,7 @@ def run_cleaning_pipeline(logger) -> None:
         df=mid_dataset,
         numeric_columns=["EDAD", "IMC", "ADRENALINA_N", "CAPNOMETRIA_MEDIO"],
         categorical_columns=["GRUPO_SANGUINEO", "CAUSA_FALLECIMIENTO_DANC"],
-        binary_columns=["SEXO", "CARDIOCOMPRESION_EXTRAHOSPITALARIA", "RECUPERACION_ALGUN_MOMENTO", "COLESTEROL"],
+        binary_columns=["SEXO", "CARDIOCOMPRESION_EXTRAHOSPITALARIA", "RECUPERACION_ALGUN_MOMENTO", "HTA", "DIABETES", "TABACO", "COLESTEROL", "ALCOHOL"],
         indicator_source_columns=["CAPNOMETRIA_MEDIO", "ADRENALINA_N"],
         categorical_fill_value=UNKNOWN_CATEGORY_LABEL,
     )
@@ -233,7 +233,7 @@ def run_cleaning_pipeline(logger) -> None:
         df=transfer_dataset,
         numeric_columns=["EDAD", "IMC", "ADRENALINA_N", "CAPNOMETRIA_TRANSFERENCIA"],
         categorical_columns=["GRUPO_SANGUINEO", "CAUSA_FALLECIMIENTO_DANC"],
-        binary_columns=["SEXO", "CARDIOCOMPRESION_EXTRAHOSPITALARIA", "RECUPERACION_ALGUN_MOMENTO", "COLESTEROL"],
+        binary_columns=["SEXO", "CARDIOCOMPRESION_EXTRAHOSPITALARIA", "RECUPERACION_ALGUN_MOMENTO", "HTA", "DIABETES", "TABACO", "COLESTEROL", "ALCOHOL"],
         indicator_source_columns=["CAPNOMETRIA_TRANSFERENCIA", "ADRENALINA_N"],
         categorical_fill_value=UNKNOWN_CATEGORY_LABEL,
     )

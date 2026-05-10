@@ -3,10 +3,10 @@
     "colsample_bytree": 0.8,
     "learning_rate": 0.05,
     "max_depth": 4,
-    "n_estimators": 100,
-    "subsample": 0.8
+    "n_estimators": 300,
+    "subsample": 0.9
   },
-  "best_cv_score": 0.5811904761904761,
+  "best_cv_score": 0.469047619047619,
   "primary_scoring": "f1",
   "seed": 1,
   "experiment": "real_plus_synthetic"

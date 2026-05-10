@@ -10,19 +10,19 @@
     "tertiary": "cv_f1_mean"
   },
   "metrics": {
-    "cv_accuracy_mean": 0.6833333333333333,
-    "cv_balanced_accuracy_mean": 0.675,
-    "cv_precision_mean": 0.6483333333333333,
+    "cv_accuracy_mean": 0.67,
+    "cv_balanced_accuracy_mean": 0.6625,
+    "cv_precision_mean": 0.615,
     "cv_recall_mean": 0.65,
-    "cv_f1_mean": 0.602857142857143,
-    "cv_roc_auc_mean": 0.6958333333333333,
+    "cv_f1_mean": 0.5928571428571429,
+    "cv_roc_auc_mean": 0.7388888888888889,
     "test_accuracy": 0.7857142857142857,
     "test_balanced_accuracy": 0.788888888888889,
     "test_precision": 0.6666666666666666,
     "test_recall": 0.8,
     "test_f1": 0.7272727272727273,
-    "test_roc_auc": 0.7333333333333334,
-    "best_cv_score": 0.602857142857143
+    "test_roc_auc": 0.8222222222222223,
+    "best_cv_score": 0.5928571428571429
   },
-  "best_params": "{'model__C': 10}"
+  "best_params": "{'model__C': 0.01}"
 }

@@ -1,7 +1,7 @@
 # TFG-Donacion-Renal-ml-web
 
 ## Descripción
-Trabajo de Fin de Grado - Aplicación móvil para la **predicción de donantes renales válidos en asistolia no controlada (uDCD)** usando **capnometría** (EtCO₂ en punto medio y en transferencia) y variables clínicas mínimas.
+Trabajo de Fin de Grado - Aplicación web para la predicción de donantes renales válidos en asistolia no controlada (uDCD) utilizando variables clínicas, demográficas y parámetros de capnometría (EtCO₂ en punto medio y transferencia).
 ---
 
 El trabajo completo consta de dos repositorios:

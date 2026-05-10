@@ -1,9 +1,9 @@
 {
   "best_params": {
-    "model__C": 10,
+    "model__C": 1,
     "model__gamma": "scale"
   },
-  "best_cv_score": 0.5933333333333333,
+  "best_cv_score": 0.5928571428571429,
   "primary_scoring": "f1",
   "seed": 999,
   "experiment": "real"

@@ -2,7 +2,7 @@
   "mid": {
     "basic_summary": {
       "rows": 70,
-      "columns": 13,
+      "columns": 17,
       "missing_total": 0,
       "duplicated_rows": 0,
       "target_distribution": {
@@ -101,7 +101,7 @@
   "transfer": {
     "basic_summary": {
       "rows": 70,
-      "columns": 13,
+      "columns": 17,
       "missing_total": 0,
       "duplicated_rows": 0,
       "target_distribution": {

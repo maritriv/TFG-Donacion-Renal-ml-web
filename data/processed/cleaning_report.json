@@ -491,7 +491,11 @@
     "SEXO": 0,
     "CARDIOCOMPRESION_EXTRAHOSPITALARIA": 0,
     "RECUPERACION_ALGUN_MOMENTO": 0,
+    "HTA": 0,
+    "DIABETES": 0,
+    "TABACO": 0,
     "COLESTEROL": 0,
+    "ALCOHOL": 0,
     "RINON_DCHO_VALIDO": 0,
     "RINON_IZDO_VALIDO": 0
   },
@@ -537,7 +541,7 @@
   },
   "mid_shape_before_missing_treatment": [
     70,
-    11
+    15
   ],
   "mid_columns_selected": [
     "EDAD",
@@ -548,7 +552,11 @@
     "CARDIOCOMPRESION_EXTRAHOSPITALARIA",
     "RECUPERACION_ALGUN_MOMENTO",
     "ADRENALINA_N",
+    "HTA",
+    "DIABETES",
+    "TABACO",
     "COLESTEROL",
+    "ALCOHOL",
     "DONANTE_VALIDO",
     "CAPNOMETRIA_MEDIO"
   ],
@@ -556,7 +564,7 @@
   "mid_temporal_null_ratios": {},
   "transfer_shape_before_missing_treatment": [
     70,
-    11
+    15
   ],
   "transfer_columns_selected": [
     "EDAD",
@@ -567,7 +575,11 @@
     "CARDIOCOMPRESION_EXTRAHOSPITALARIA",
     "RECUPERACION_ALGUN_MOMENTO",
     "ADRENALINA_N",
+    "HTA",
+    "DIABETES",
+    "TABACO",
     "COLESTEROL",
+    "ALCOHOL",
     "DONANTE_VALIDO",
     "CAPNOMETRIA_TRANSFERENCIA"
   ],
@@ -630,7 +642,7 @@
   "mid_validation": {
     "dataset_name": "MID",
     "rows": 70,
-    "columns": 13,
+    "columns": 17,
     "issues": [],
     "remaining_null_total": 0,
     "remaining_nulls_by_column": {}
@@ -638,18 +650,18 @@
   "transfer_validation": {
     "dataset_name": "TRANSFER",
     "rows": 70,
-    "columns": 13,
+    "columns": 17,
     "issues": [],
     "remaining_null_total": 0,
     "remaining_nulls_by_column": {}
   },
   "mid_shape_final": [
     70,
-    13
+    17
   ],
   "transfer_shape_final": [
     70,
-    13
+    17
   ],
   "output_mid_path": "C:\\TFG-Donacion-Renal-ml-web\\data\\processed\\dataset_mid_clean.csv",
   "output_transfer_path": "C:\\TFG-Donacion-Renal-ml-web\\data\\processed\\dataset_transfer_clean.csv"

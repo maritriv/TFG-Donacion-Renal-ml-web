@@ -1,10 +1,10 @@
 {
   "best_params": {
-    "max_depth": 5,
-    "min_samples_leaf": 1,
-    "n_estimators": 500
+    "max_depth": null,
+    "min_samples_leaf": 4,
+    "n_estimators": 300
   },
-  "best_cv_score": 0.5873809523809523,
+  "best_cv_score": 0.41571428571428565,
   "primary_scoring": "f1",
   "seed": 1,
   "experiment": "real_plus_synthetic"

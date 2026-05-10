@@ -6,9 +6,9 @@
       "final_metadata_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\final_model_export\\mid\\final_model_metadata.json",
       "final_metrics_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\final_model_export\\mid\\final_metrics.json",
       "selected_model_name": "logistic_regression",
-      "selected_experiment": "real",
-      "selected_seed": 999,
-      "used_synthetic_data": false
+      "selected_experiment": "real_plus_synthetic",
+      "selected_seed": 123,
+      "used_synthetic_data": true
     },
     {
       "dataset": "transfer",
@@ -17,7 +17,7 @@
       "final_metrics_path": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\final_model_export\\transfer\\final_metrics.json",
       "selected_model_name": "logistic_regression",
       "selected_experiment": "real_plus_synthetic",
-      "selected_seed": 999,
+      "selected_seed": 123,
       "used_synthetic_data": true
     }
   ],

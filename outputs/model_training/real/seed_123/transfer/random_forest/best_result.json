@@ -4,7 +4,7 @@
     "min_samples_leaf": 4,
     "n_estimators": 300
   },
-  "best_cv_score": 0.75,
+  "best_cv_score": 0.7,
   "primary_scoring": "f1",
   "seed": 123,
   "experiment": "real"
