@@ -501,23 +501,6 @@ La gestión de usuarios y predicciones se realiza mediante **Firebase**, lo que 
 
 ---
 
-## Estado del proyecto
-
-Estado actual del repositorio:
-
-- [x] limpieza y preparación de datos  
-- [x] generación de datasets de modelado  
-- [x] análisis exploratorio  
-- [x] entrenamiento y comparación de modelos  
-- [x] evaluación final  
-- [x] exportación de modelos finales  
-- [x] desarrollo de la aplicación web (frontend y backend)  
-- [ ] validación completa en entorno real  
-- [ ] batería de tests automatizados  
-- [ ] despliegue final del sistema 
-
----
-
 ## Tecnologías utilizadas
 
 ### Modelado y procesamiento de datos
