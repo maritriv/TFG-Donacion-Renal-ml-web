@@ -95,7 +95,11 @@
         "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\mid_hist_capnometria_medio.png"
       ],
       "target_distribution": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\mid_target_distribution.png",
-      "correlation_heatmap": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\mid_correlation_heatmap.png"
+      "correlation_heatmap": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\mid_correlation_heatmap.png",
+      "synthetic_comparison": [
+        "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\mid_real_vs_synthetic_edad.png",
+        "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\mid_real_vs_synthetic_capnometria_medio.png"
+      ]
     }
   },
   "transfer": {
@@ -194,7 +198,11 @@
         "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\transfer_hist_capnometria_transferencia.png"
       ],
       "target_distribution": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\transfer_target_distribution.png",
-      "correlation_heatmap": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\transfer_correlation_heatmap.png"
+      "correlation_heatmap": "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\transfer_correlation_heatmap.png",
+      "synthetic_comparison": [
+        "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\transfer_real_vs_synthetic_edad.png",
+        "C:\\TFG-Donacion-Renal-ml-web\\outputs\\exploratory_analysis\\transfer_real_vs_synthetic_capnometria_transferencia.png"
+      ]
     }
   }
 }

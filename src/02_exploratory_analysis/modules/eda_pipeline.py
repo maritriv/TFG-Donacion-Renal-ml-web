@@ -14,6 +14,8 @@ from .config import (
     PROCESSED_DIR_RELATIVE_PATH,
     TARGET_COLUMN,
     TRANSFER_CLEAN_FILENAME,
+    MID_SYNTH_FILENAME,
+    TRANSFER_SYNTH_FILENAME,
 )
 from .eda_steps import (
     categorical_summary,
@@ -27,6 +29,7 @@ from .eda_steps import (
     save_eda_report,
     save_histograms,
     save_target_barplot,
+    save_real_vs_synthetic_histogram,
 )
 from src.common.visual_logger import (
     log_banner,
@@ -55,6 +58,9 @@ def run_eda_pipeline(logger) -> None:
     mid_path = processed_dir / MID_CLEAN_FILENAME
     transfer_path = processed_dir / TRANSFER_CLEAN_FILENAME
 
+    mid_synth_path = processed_dir / MID_SYNTH_FILENAME
+    transfer_synth_path = processed_dir / TRANSFER_SYNTH_FILENAME   
+
     log_banner(logger, "INICIO EXPLORATORY ANALYSIS", style="bold yellow")
     log_kv(logger, "Raiz del proyecto", root)
 
@@ -62,6 +68,9 @@ def run_eda_pipeline(logger) -> None:
     ensure_output_dir(output_dir)
     mid_df = load_dataset(mid_path)
     transfer_df = load_dataset(transfer_path)
+
+    mid_synth_df = load_dataset(mid_synth_path)
+    transfer_synth_df = load_dataset(transfer_synth_path)   
 
     log_kv(logger, "MID shape", f"{mid_df.shape[0]} x {mid_df.shape[1]}")
     log_kv(logger, "TRANSFER shape", f"{transfer_df.shape[0]} x {transfer_df.shape[1]}")
@@ -132,6 +141,47 @@ def run_eda_pipeline(logger) -> None:
     mid_corr_path = save_correlation_heatmap(mid_corr, output_dir, "MID")
     transfer_corr_path = save_correlation_heatmap(transfer_corr, output_dir, "TRANSFER")
 
+    mid_synthetic_comparison_plots = [
+        save_real_vs_synthetic_histogram(
+            real_df=mid_df,
+            synthetic_df=mid_synth_df,
+            column="EDAD",
+            output_dir=output_dir,
+            prefix="MID",
+        ),
+        save_real_vs_synthetic_histogram(
+            real_df=mid_df,
+            synthetic_df=mid_synth_df,
+            column="CAPNOMETRIA_MEDIO",
+            output_dir=output_dir,
+            prefix="MID",
+        ),
+    ]
+
+    transfer_synthetic_comparison_plots = [
+        save_real_vs_synthetic_histogram(
+            real_df=transfer_df,
+            synthetic_df=transfer_synth_df,
+            column="EDAD",
+            output_dir=output_dir,
+            prefix="TRANSFER",
+        ),
+        save_real_vs_synthetic_histogram(
+            real_df=transfer_df,
+            synthetic_df=transfer_synth_df,
+            column="CAPNOMETRIA_TRANSFERENCIA",
+            output_dir=output_dir,
+            prefix="TRANSFER",
+        ),
+    ]
+
+    mid_synthetic_comparison_plots = [
+        path for path in mid_synthetic_comparison_plots if path is not None
+    ]
+    transfer_synthetic_comparison_plots = [
+        path for path in transfer_synthetic_comparison_plots if path is not None
+    ]
+
     log_kv(logger, "Graficos MID", len(mid_hist_paths) + int(mid_target_plot is not None) + int(mid_corr_path is not None))
     log_kv(
         logger,
@@ -149,6 +199,7 @@ def run_eda_pipeline(logger) -> None:
                 "histograms": mid_hist_paths,
                 "target_distribution": mid_target_plot,
                 "correlation_heatmap": mid_corr_path,
+                "synthetic_comparison": mid_synthetic_comparison_plots,
             },
         },
         "transfer": {
@@ -159,6 +210,7 @@ def run_eda_pipeline(logger) -> None:
                 "histograms": transfer_hist_paths,
                 "target_distribution": transfer_target_plot,
                 "correlation_heatmap": transfer_corr_path,
+                "synthetic_comparison": transfer_synthetic_comparison_plots,
             },
         },
     }

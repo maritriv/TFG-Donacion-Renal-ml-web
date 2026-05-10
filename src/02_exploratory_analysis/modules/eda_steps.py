@@ -146,6 +146,37 @@ def save_correlation_heatmap(corr_df: pd.DataFrame, output_dir: Path, prefix: st
     plt.close()
     return str(path)
 
+def save_real_vs_synthetic_histogram(
+    real_df: pd.DataFrame,
+    synthetic_df: pd.DataFrame,
+    column: str,
+    output_dir: Path,
+    prefix: str,
+) -> str | None:
+    """Guarda un histograma comparativo entre datos reales y sintéticos."""
+    if column not in real_df.columns or column not in synthetic_df.columns:
+        return None
+
+    real_series = pd.to_numeric(real_df[column], errors="coerce").dropna()
+    synthetic_series = pd.to_numeric(synthetic_df[column], errors="coerce").dropna()
+
+    if real_series.empty or synthetic_series.empty:
+        return None
+
+    plt.figure(figsize=(7, 4))
+    plt.hist(real_series, bins=15, alpha=0.6, label="Real")
+    plt.hist(synthetic_series, bins=15, alpha=0.6, label="Sintético")
+    plt.title(f"{prefix} - Comparación real vs sintético: {column}")
+    plt.xlabel(column)
+    plt.ylabel("Frecuencia")
+    plt.legend()
+    plt.tight_layout()
+
+    path = output_dir / f"{prefix.lower()}_real_vs_synthetic_{column.lower()}.png"
+    plt.savefig(path, dpi=150)
+    plt.close()
+
+    return str(path)
 
 def save_eda_report(report_data: Dict[str, object], report_path: Path) -> None:
     """Guarda reporte JSON del EDA."""

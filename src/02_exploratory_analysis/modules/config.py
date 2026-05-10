@@ -9,6 +9,8 @@ EDA_OUTPUT_DIR_RELATIVE_PATH = Path("outputs/exploratory_analysis")
 # Entradas
 MID_CLEAN_FILENAME = "dataset_mid_clean.csv"
 TRANSFER_CLEAN_FILENAME = "dataset_transfer_clean.csv"
+MID_SYNTH_FILENAME = "dataset_mid_synthetic.csv"
+TRANSFER_SYNTH_FILENAME = "dataset_transfer_synthetic.csv"
 
 # Salidas
 EDA_REPORT_FILENAME = "eda_report.json"
