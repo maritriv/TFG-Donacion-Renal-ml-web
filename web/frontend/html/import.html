@@ -46,27 +46,44 @@
     <div class="import-help-card">
       <h2>Formato del archivo CSV</h2>
 
-      <p>Solo se acepta el CSV exportado desde la web.</p>
+      <p>
+        Se aceptan archivos CSV exportados desde la web o compatibles con el formato clínico de importación.
+      </p>
 
       <p>
         <strong>Columnas obligatorias:</strong><br>
-        Edad, Femenino, Capnometria, Causa_cardiaca, Cardio_manual,
-        Recuperacion_pulso, Prediction_mode
+        Edad, Sexo/Femenino, Capnometria, Causa_cardiaca o Causa_fallecimiento_codigo,
+        Cardio_manual, Recuperacion_pulso, Prediction_mode
+      </p>
+
+      <p>
+        <strong>También se aceptan variantes de nombres:</strong><br>
+        • Sexo o Femenino.<br>
+        • Cardiocompresion, Cardiocompresión o Cardio_manual.<br>
+        • Capnometria o Capnometría.<br>
+        • Recuperacion_pulso, Recuperación_pulso o Rec. del pulso.
       </p>
 
       <p>
         <strong>Reglas:</strong><br>
-        • Femenino, Causa_cardiaca y Recuperacion_pulso deben ser Si/No.<br>
-        • También se aceptan 1/0, true/false, Hombre/Mujer o Masculino/Femenino.<br>
+        • Sexo/Femenino acepta Si/No, 1/0, true/false, Hombre/Mujer o Masculino/Femenino.<br>
+        • Causa_cardiaca y Recuperacion_pulso aceptan Si/No, 1/0 o true/false.<br>
         • Cardio_manual debe ser Manual o Mecánica.<br>
         • Prediction_mode debe ser MID_RCP o AFTER_RCP.
+      </p>
+
+      <p>
+        <strong>Campos opcionales del formato web/ML:</strong><br>
+        IMC, Grupo_sanguineo, Adrenalina, HTA, Diabetes, Tabaco, Colesterol,
+        Alcohol, Resultado_ML, Probabilidad_ML y datos del modelo.
       </p>
 
       <p>
         <strong>Notas:</strong><br>
         • MID_RCP corresponde a la predicción a los 20 minutos de RCP.<br>
         • AFTER_RCP corresponde a la predicción después del procedimiento de RCP.<br>
-        • Si falta alguna columna obligatoria o algún valor no es válido, el archivo no se importará.
+        • Las filas duplicadas no se importarán.<br>
+        • Si falta una columna obligatoria o algún valor no es válido, la fila será descartada.
       </p>
 
       <button type="button" id="btn-help-ok" class="btn import-modal-main-btn">

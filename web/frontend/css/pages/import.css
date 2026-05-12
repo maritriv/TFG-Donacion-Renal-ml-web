@@ -105,7 +105,15 @@
   display: none;
 }
 
-.import-help-card,
+.import-help-card {
+  width: min(980px, 95vw);
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 20px 28px;
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.22);
+  color: #042939;
+}
+
 .import-duplicate-card {
   width: min(520px, 92vw);
   background: #ffffff;
@@ -150,4 +158,10 @@
   font-size: 16px;
   font-weight: 800;
   cursor: pointer;
+}
+
+.import-help-card p {
+  font-size: 14px;
+  line-height: 1.22;
+  margin: 8px 0;
 }
