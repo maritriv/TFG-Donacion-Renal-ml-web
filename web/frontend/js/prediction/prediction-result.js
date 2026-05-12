@@ -60,6 +60,29 @@ function formatProbability(probability) {
   return `Probabilidad de válido: ${(probability * 100).toFixed(2)}%`;
 }
 
+function formatRulesMargin(indice, corte) {
+  if (indice === null || indice === undefined || corte === null || corte === undefined) {
+    return "";
+  }
+
+  const margin = Number(indice) - Number(corte);
+  const sign = margin >= 0 ? "+" : "";
+
+  return `${sign}${margin.toFixed(4)}`;
+}
+
+function paintRulesIndex(indice, corte) {
+  const margin = Number(indice) - Number(corte);
+  const marginClass = margin >= 0 ? "rules-margin-positive" : "rules-margin-negative";
+
+  rulesIndex.innerHTML = `
+    Índice: ${Number(indice).toFixed(4)}
+    <span class="${marginClass}">
+      ${formatRulesMargin(indice, corte)}
+    </span>
+  `;
+}
+
 function cleanFileName(value) {
   return String(value || "Medico")
     .normalize("NFD")
@@ -286,7 +309,7 @@ requireRole("Médico", async () => {
   paintResult(mlIcon, mlIsValid);
 
   rulesLabel.textContent = resultText(rulesIsValid);
-  rulesIndex.textContent = `Índice: ${Number(data.rules_result.indice).toFixed(4)}`;
+  paintRulesIndex(data.rules_result.indice, data.rules_result.corte);
 
   mlLabel.textContent = resultText(mlIsValid);
   mlProbability.textContent = formatProbability(data.ml_result.probability);
