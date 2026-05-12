@@ -60,6 +60,10 @@ const filterGrupo = document.getElementById("filter-grupo");
 const filterAdrenalinaMin = document.getElementById("filter-adrenalina-min");
 const filterAdrenalinaMax = document.getElementById("filter-adrenalina-max");
 const filterColesterol = document.getElementById("filter-colesterol");
+const filterHta = document.getElementById("filter-hta");
+const filterDiabetes = document.getElementById("filter-diabetes");
+const filterTabaco = document.getElementById("filter-tabaco");
+const filterAlcohol = document.getElementById("filter-alcohol");
 
 const btnFilterClear = document.getElementById("btn-filter-clear");
 const btnFilterCancel = document.getElementById("btn-filter-cancel");
@@ -88,10 +92,25 @@ function dash(value) {
   return value === null || value === undefined || value === "" ? "—" : value;
 }
 
+function isDash(value) {
+  return value === null || value === undefined || value === "" || value === "—";
+}
+
 function mapSexo(value) {
-  if (value === "Mujer" || value === "Si" || value === "Sí") return "M";
-  if (value === "Hombre" || value === "No") return "H";
+  if (value === "Mujer" || value === "Si" || value === "Sí") return "Mujer";
+  if (value === "Hombre" || value === "No") return "Hombre";
   return dash(value);
+}
+
+function mapBinarySiNo(value) {
+  if (isDash(value)) return "—";
+
+  const normalized = String(value).trim();
+
+  if (normalized === "0" || normalized === "No") return "No";
+  if (normalized === "1" || normalized === "Si" || normalized === "Sí") return "Sí";
+
+  return value;
 }
 
 function mapResultado(value) {
@@ -99,7 +118,7 @@ function mapResultado(value) {
 }
 
 function formatIndice(value) {
-  if (value === null || value === undefined || value === "") return "—";
+  if (isDash(value)) return "—";
   return Number(value).toFixed(3);
 }
 
@@ -107,10 +126,6 @@ function modeToLabel(mode, fallback) {
   if (mode === "MID_RCP") return "Mitad del procedimiento de RCP (20 min)";
   if (mode === "AFTER_RCP") return "Transferencia hospitalaria";
   return fallback || "—";
-}
-
-function isDash(value) {
-  return value === null || value === undefined || value === "" || value === "—";
 }
 
 function mapGrupoSanguineo(value) {
@@ -133,14 +148,7 @@ function mapGrupoSanguineo(value) {
 }
 
 function mapColesterol(value) {
-  if (isDash(value)) return "—";
-
-  const normalized = String(value).trim();
-
-  if (normalized === "0") return "No";
-  if (normalized === "1") return "Sí";
-
-  return value;
+  return mapBinarySiNo(value);
 }
 
 function getExtraValue(prediction, keyInputValues, keyInputMl) {
@@ -152,6 +160,58 @@ function getExtraValue(prediction, keyInputValues, keyInputMl) {
   const inputMl = ml.input_ml || {};
 
   return dash(inputValues[keyInputValues] ?? inputMl[keyInputMl]);
+}
+
+function cleanFileName(value) {
+  return String(value || "Medico")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^A-Za-z0-9_ ]/g, "")
+    .trim()
+    .replace(/\s+/g, "_") || "Medico";
+}
+
+function formatDateForFile() {
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+
+  return `${pad(now.getDate())}-${pad(now.getMonth() + 1)}-${now.getFullYear()}_${pad(now.getHours())}-${pad(now.getMinutes())}`;
+}
+
+function stripAccents(value) {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function csvValue(value) {
+  const raw = stripAccents(value)
+    .replace(/\r/g, " ")
+    .replace(/\n/g, " ")
+    .trim();
+
+  if (raw.includes(",") || raw.includes('"')) {
+    return `"${raw.replace(/"/g, '""')}"`;
+  }
+
+  return raw;
+}
+
+function formatCsvDate(timestamp) {
+  if (timestamp?.toDate) {
+    return timestamp.toDate().toLocaleString("es-ES");
+  }
+
+  return "";
+}
+
+function getMlPredictionLabel(mlPrediction) {
+  if (!mlPrediction?.ml_result) return "—";
+
+  const mlResult = mlPrediction.ml_result;
+  const isValid = Number(mlResult.prediction) === 1 || mlResult.label_legible === "Si";
+
+  return isValid ? "Valido" : "No valido";
 }
 
 // ===================== SORT =====================
@@ -212,6 +272,8 @@ function closeSortModal() {
   sortModalOverlay.hidden = true;
 }
 
+// ===================== FILTERS =====================
+
 function toNumberOrNull(value) {
   if (value === null || value === undefined || value === "") return null;
   const number = Number(value);
@@ -243,20 +305,35 @@ function predictionMatchesFilters(prediction) {
   const adrenalinaMin = toNumberOrNull(filterAdrenalinaMin.value);
   const adrenalinaMax = toNumberOrNull(filterAdrenalinaMax.value);
 
+  const causaFallecimiento = dash(
+    prediction.causa_fallecimiento_danc ||
+      getExtraValue(prediction, "causaFallecimientoDancLabel", "CAUSA_FALLECIMIENTO_DANC")
+  );
+
   const imc = getExtraValue(prediction, "imc", "IMC");
   const grupo = mapGrupoSanguineo(getExtraValue(prediction, "grupoSanguineoLabel", "GRUPO_SANGUINEO"));
   const adrenalina = getExtraValue(prediction, "adrenalina", "ADRENALINA_N");
   const colesterol = mapColesterol(getExtraValue(prediction, "colesterolLabel", "COLESTEROL"));
+
+  const hta = mapBinarySiNo(getExtraValue(prediction, "htaLabel", "HTA"));
+  const diabetes = mapBinarySiNo(getExtraValue(prediction, "diabetesLabel", "DIABETES"));
+  const tabaco = mapBinarySiNo(getExtraValue(prediction, "tabacoLabel", "TABACO"));
+  const alcohol = mapBinarySiNo(getExtraValue(prediction, "alcoholLabel", "ALCOHOL"));
 
   if ((imcMin !== null || imcMax !== null) && !matchesRange(imc, imcMin, imcMax)) return false;
   if (filterGrupo.value && grupo !== filterGrupo.value) return false;
   if ((adrenalinaMin !== null || adrenalinaMax !== null) && !matchesRange(adrenalina, adrenalinaMin, adrenalinaMax)) return false;
   if (filterColesterol.value && colesterol !== filterColesterol.value) return false;
 
+  if (filterHta.value && hta !== filterHta.value) return false;
+  if (filterDiabetes.value && diabetes !== filterDiabetes.value) return false;
+  if (filterTabaco.value && tabaco !== filterTabaco.value) return false;
+  if (filterAlcohol.value && alcohol !== filterAlcohol.value) return false;
+
   if ((edadMin !== null || edadMax !== null) && !matchesRange(prediction.edad, edadMin, edadMax)) return false;
   if (filterSexo.value && mapSexo(prediction.femenino) !== filterSexo.value) return false;
   if ((capnoMin !== null || capnoMax !== null) && !matchesRange(prediction.capnometria, capnoMin, capnoMax)) return false;
-  if (filterCausa.value && normalizeSiNo(prediction.causa_cardiaca) !== filterCausa.value) return false;
+  if (filterCausa.value && causaFallecimiento !== filterCausa.value) return false;
   if (filterCardio.value && prediction.cardio_manual !== filterCardio.value) return false;
   if (filterRec.value && normalizeSiNo(prediction.rec_pulso) !== filterRec.value) return false;
   if (filterResultado.value && normalizeSiNo(prediction.valido) !== filterResultado.value) return false;
@@ -288,29 +365,143 @@ function closeFilterModal() {
   filterModalOverlay.hidden = true;
 }
 
+// ===================== CSV =====================
+
 function exportPredictionsCsv(predictions) {
   if (!predictions.length) {
     alert("No hay predicciones para exportar.");
     return;
   }
 
-  const headers = ["Edad","Sexo","Capnometria","Resultado"];
+  const headers = [
+    "ID",
+    "Edad",
+    "Femenino",
+    "Capnometria",
+    "Causa_fallecimiento",
+    "Causa_fallecimiento_codigo",
+    "Causa_cardiaca_reglas",
+    "Cardio_manual",
+    "Recuperacion_pulso",
+    "Prediction_mode",
+    "Momento",
+    "IMC",
+    "Grupo_sanguineo",
+    "Adrenalina",
+    "HTA",
+    "Diabetes",
+    "Tabaco",
+    "Colesterol",
+    "Alcohol",
+    "Resultado_reglas",
+    "Indice",
+    "Resultado_ML",
+    "Probabilidad_ML",
+    "ML_dataset",
+    "ML_modelo",
+    "ML_experimento",
+    "ML_seed",
+    "ML_version",
+    "UID_medico",
+    "Nombre_medico",
+    "Fecha"
+  ];
 
-  const rows = predictions.map(p => [
-    p.edad,
-    mapSexo(p.femenino),
-    p.capnometria,
-    mapResultado(p.valido)
-  ].join(","));
+  const rows = predictions.map((prediction) => {
+    const mlPrediction = prediction.ml_prediction || null;
+    const inputValues = mlPrediction?.input_values || {};
+    const inputMl = mlPrediction?.input_ml || {};
+    const mlResult = mlPrediction?.ml_result || {};
+    const modelInfo = mlPrediction?.model_info || {};
+
+    const momento = modeToLabel(
+      prediction.prediction_mode,
+      prediction.momento_prediccion_legible
+    );
+
+    const imc = inputValues.imc ?? inputMl.IMC ?? "";
+    const grupo = mapGrupoSanguineo(
+      inputValues.grupoSanguineoLabel ?? inputMl.GRUPO_SANGUINEO
+    );
+    const adrenalina = inputValues.adrenalina ?? inputMl.ADRENALINA_N ?? "";
+    const colesterol = mapColesterol(
+      inputValues.colesterolLabel ?? inputMl.COLESTEROL
+    );
+
+    const causaFallecimiento =
+      prediction.causa_fallecimiento_danc ||
+      inputValues.causaFallecimientoDancLabel ||
+      "";
+
+    const causaFallecimientoCodigo =
+      prediction.causa_fallecimiento_danc_codigo ??
+      inputValues.causaFallecimientoDanc ??
+      inputMl.CAUSA_FALLECIMIENTO_DANC ??
+      "";
+
+    const hta = mapBinarySiNo(inputValues.htaLabel ?? inputMl.HTA);
+    const diabetes = mapBinarySiNo(inputValues.diabetesLabel ?? inputMl.DIABETES);
+    const tabaco = mapBinarySiNo(inputValues.tabacoLabel ?? inputMl.TABACO);
+    const alcohol = mapBinarySiNo(inputValues.alcoholLabel ?? inputMl.ALCOHOL);
+
+    const probability =
+      mlResult.probability !== null && mlResult.probability !== undefined
+        ? Number(mlResult.probability).toFixed(4)
+        : "";
+
+    return [
+      prediction.id,
+      prediction.edad,
+      prediction.femenino,
+      prediction.capnometria,
+      causaFallecimiento,
+      causaFallecimientoCodigo,
+      prediction.causa_cardiaca,
+      prediction.cardio_manual,
+      prediction.rec_pulso,
+      prediction.prediction_mode,
+      momento,
+      imc,
+      grupo,
+      adrenalina,
+      hta,
+      diabetes,
+      tabaco,
+      colesterol,
+      alcohol,
+      mapResultado(prediction.valido),
+      formatIndice(prediction.indice),
+      getMlPredictionLabel(mlPrediction),
+      probability,
+      modelInfo.dataset,
+      modelInfo.model,
+      modelInfo.experiment,
+      modelInfo.seed,
+      modelInfo.version_modelo,
+      prediction.uid_medico,
+      prediction.nombre_medico_pdf || prediction.nombre_medico,
+      formatCsvDate(prediction.fecha)
+    ].map(csvValue).join(",");
+  });
 
   const csvContent = [headers.join(","), ...rows].join("\n");
 
-  const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob(["\uFEFF" + csvContent], {
+    type: "text/csv;charset=utf-8;"
+  });
+
   const url = URL.createObjectURL(blob);
+
+  const doctorName =
+    predictions[0]?.nombre_medico_pdf ||
+    predictions[0]?.nombre_medico ||
+    "medico";
+
+  const fileName = `predicciones_${cleanFileName(doctorName)}_${formatDateForFile()}.csv`;
 
   const link = document.createElement("a");
   link.href = url;
-  link.download = "predicciones.csv";
+  link.download = fileName;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -486,28 +677,41 @@ function renderPredictions(predictions) {
       prediction.momento_prediccion_legible
     );
 
+    const causaFallecimiento = dash(
+      prediction.causa_fallecimiento_danc ||
+        getExtraValue(prediction, "causaFallecimientoDancLabel", "CAUSA_FALLECIMIENTO_DANC")
+    );
+
     const imc = getExtraValue(prediction, "imc", "IMC");
     const grupo = mapGrupoSanguineo(
       getExtraValue(prediction, "grupoSanguineoLabel", "GRUPO_SANGUINEO")
     );
     const adrenalina = getExtraValue(prediction, "adrenalina", "ADRENALINA_N");
+    const hta = mapBinarySiNo(getExtraValue(prediction, "htaLabel", "HTA"));
+    const diabetes = mapBinarySiNo(getExtraValue(prediction, "diabetesLabel", "DIABETES"));
+    const tabaco = mapBinarySiNo(getExtraValue(prediction, "tabacoLabel", "TABACO"));
     const colesterol = mapColesterol(
       getExtraValue(prediction, "colesterolLabel", "COLESTEROL")
     );
+    const alcohol = mapBinarySiNo(getExtraValue(prediction, "alcoholLabel", "ALCOHOL"));
 
     row.innerHTML = `
       <td>${index + 1}</td>
       <td>${dash(prediction.edad)}</td>
       <td>${mapSexo(prediction.femenino)}</td>
       <td>${dash(prediction.capnometria)}</td>
-      <td>${dash(prediction.causa_cardiaca)}</td>
+      <td>${causaFallecimiento}</td>
       <td>${dash(prediction.cardio_manual)}</td>
       <td>${dash(prediction.rec_pulso)}</td>
       <td>${momento}</td>
       <td>${imc}</td>
       <td>${grupo}</td>
       <td>${adrenalina}</td>
+      <td>${hta}</td>
+      <td>${diabetes}</td>
+      <td>${tabaco}</td>
       <td>${colesterol}</td>
+      <td>${alcohol}</td>
       <td>${mapResultado(prediction.valido)}</td>
       <td>${formatIndice(prediction.indice)}</td>
       <td>
@@ -615,8 +819,6 @@ confirmAccept.addEventListener("click", () => {
 requireRole("Administrador", async () => {
   setEditMode(false);
 
-  // ===================== BOTONES HISTORIAL =====================
-
   if (btnSort) {
     btnSort.addEventListener("click", openSortModal);
   }
@@ -655,8 +857,6 @@ requireRole("Administrador", async () => {
       exportPredictionsCsv(displayedPredictions);
     });
   }
-
-  // ===================== CARGA DATOS =====================
 
   await loadUser();
   await loadDoctorPredictions();

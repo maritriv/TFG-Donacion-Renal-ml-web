@@ -65,6 +65,7 @@ const COEFS_AFTER = {
 
 function normalize(value) {
   return String(value ?? "")
+    .replace(/^\uFEFF/, "")
     .trim()
     .toLowerCase()
     .normalize("NFD")
@@ -93,11 +94,15 @@ function yesNoLabel(value01) {
   return value01 === 1 ? "Si" : "No";
 }
 
+function yesNoLabelAccent(value01) {
+  return value01 === 1 ? "Sí" : "No";
+}
+
 function to01(value) {
   const v = normalize(value);
 
-  if (["1", "si", "sí", "true"].includes(v)) return 1;
-  if (["0", "no", "false"].includes(v)) return 0;
+  if (["1", "si", "sí", "true", "valido", "válido"].includes(v)) return 1;
+  if (["0", "no", "false", "no valido", "no válido"].includes(v)) return 0;
 
   const number = Number(value);
   return Number.isInteger(number) && (number === 0 || number === 1)
@@ -135,6 +140,44 @@ function parseMode(value) {
   if (loose.includes("despues") || loose.includes("transferencia")) return "AFTER_RCP";
 
   return null;
+}
+
+function toNumberOrNull(value) {
+  const raw = String(value ?? "").trim();
+
+  if (!raw || raw === "—") return null;
+
+  const number = Number(raw.replace(",", "."));
+  return Number.isFinite(number) ? number : null;
+}
+
+function parseGrupoSanguineo(value) {
+  const v = normalize(value).toUpperCase();
+
+  if (v === "A" || v === "0") return { code: 0, label: "A" };
+  if (v === "B" || v === "1") return { code: 1, label: "B" };
+  if (v === "AB" || v === "2") return { code: 2, label: "AB" };
+  if (v === "O" || v === "3") return { code: 3, label: "O" };
+
+  return { code: null, label: "" };
+}
+
+function causaLabelFromCode(code, fallback = "") {
+  const map = {
+    0: "Desconocido",
+    1: "TEP",
+    2: "Arritmia",
+    3: "Cardiopatía isquémica",
+    4: "Tóxicos",
+    5: "Muerte súbita",
+    6: "Otras"
+  };
+
+  return map[Number(code)] || fallback || "";
+}
+
+function causaCardiacaFromCodigo(code) {
+  return [2, 3, 5].includes(Number(code)) ? 1 : 0;
 }
 
 function parseCsvLine(line, separator) {
@@ -326,16 +369,36 @@ async function validateAndParseCsv(file) {
   }
 
   const separator = lines[0].includes(";") && !lines[0].includes(",") ? ";" : ",";
-  const header = parseCsvLine(lines[0], separator).map((h) => h.trim());
+  const header = parseCsvLine(lines[0], separator).map((h) =>
+    h.replace(/^\uFEFF/, "").trim()
+  );
 
   const columnAliases = {
+    id: ["ID"],
     edad: ["Edad"],
     sexo: ["Sexo", "Femenino"],
     capnometria: ["Capnometria", "Capnometría"],
-    causa: ["Causa_cardiaca", "Causa cardíaca", "Causa_cardiaca"],
+    causa: ["Causa_cardiaca", "Causa cardíaca", "Causa_cardiaca_reglas"],
+    causaCodigo: ["Causa_fallecimiento_codigo"],
+    causaLabel: ["Causa_fallecimiento"],
     cardio: ["Cardiocompresion", "Cardiocompresión", "Cardio_manual"],
     rec: ["Recuperacion_pulso", "Rec. del pulso", "Recuperación_pulso"],
-    mode: ["Prediction_mode"]
+    mode: ["Prediction_mode"],
+    imc: ["IMC"],
+    grupo: ["Grupo_sanguineo", "Grupo sanguíneo"],
+    adrenalina: ["Adrenalina"],
+    hta: ["HTA"],
+    diabetes: ["Diabetes"],
+    tabaco: ["Tabaco"],
+    colesterol: ["Colesterol"],
+    alcohol: ["Alcohol"],
+    resultadoMl: ["Resultado_ML"],
+    probabilidadMl: ["Probabilidad_ML"],
+    mlDataset: ["ML_dataset"],
+    mlModelo: ["ML_modelo"],
+    mlExperimento: ["ML_experimento"],
+    mlSeed: ["ML_seed"],
+    mlVersion: ["ML_version"]
   };
 
   function indexOfAny(names) {
@@ -344,20 +407,39 @@ async function validateAndParseCsv(file) {
     );
   }
 
+  const idxId = indexOfAny(columnAliases.id);
   const idxEdad = indexOfAny(columnAliases.edad);
   const idxFem = indexOfAny(columnAliases.sexo);
   const idxCap = indexOfAny(columnAliases.capnometria);
   const idxCausa = indexOfAny(columnAliases.causa);
+  const idxCausaCodigo = indexOfAny(columnAliases.causaCodigo);
+  const idxCausaLabel = indexOfAny(columnAliases.causaLabel);
   const idxCardio = indexOfAny(columnAliases.cardio);
   const idxRec = indexOfAny(columnAliases.rec);
   const idxMode = indexOfAny(columnAliases.mode);
+
+  const idxImc = indexOfAny(columnAliases.imc);
+  const idxGrupo = indexOfAny(columnAliases.grupo);
+  const idxAdrenalina = indexOfAny(columnAliases.adrenalina);
+  const idxHta = indexOfAny(columnAliases.hta);
+  const idxDiabetes = indexOfAny(columnAliases.diabetes);
+  const idxTabaco = indexOfAny(columnAliases.tabaco);
+  const idxColesterol = indexOfAny(columnAliases.colesterol);
+  const idxAlcohol = indexOfAny(columnAliases.alcohol);
+  const idxResultadoMl = indexOfAny(columnAliases.resultadoMl);
+  const idxProbabilidadMl = indexOfAny(columnAliases.probabilidadMl);
+  const idxMlDataset = indexOfAny(columnAliases.mlDataset);
+  const idxMlModelo = indexOfAny(columnAliases.mlModelo);
+  const idxMlExperimento = indexOfAny(columnAliases.mlExperimento);
+  const idxMlSeed = indexOfAny(columnAliases.mlSeed);
+  const idxMlVersion = indexOfAny(columnAliases.mlVersion);
 
   const missing = [];
 
   if (idxEdad === -1) missing.push("Edad");
   if (idxFem === -1) missing.push("Sexo/Femenino");
   if (idxCap === -1) missing.push("Capnometria");
-  if (idxCausa === -1) missing.push("Causa_cardiaca");
+  if (idxCausa === -1 && idxCausaCodigo === -1) missing.push("Causa_cardiaca_reglas o Causa_fallecimiento_codigo");
   if (idxCardio === -1) missing.push("Cardiocompresion/Cardio_manual");
   if (idxRec === -1) missing.push("Recuperacion_pulso");
   if (idxMode === -1) missing.push("Prediction_mode");
@@ -377,13 +459,34 @@ async function validateAndParseCsv(file) {
       continue;
     }
 
-    const edad = Number(cols[idxEdad]);
-    const capno = Number(cols[idxCap]);
-    const fem = femeninoTo01(cols[idxFem]);
-    const cardio = cardioTo01(cols[idxCardio]);
-    const rec = to01(cols[idxRec]);
-    const causa = to01(cols[idxCausa]);
-    const mode = parseMode(cols[idxMode]);
+    const get = (index) => index === -1 ? "" : cols[index];
+
+    const edad = Number(get(idxEdad));
+    const capno = Number(get(idxCap));
+    const fem = femeninoTo01(get(idxFem));
+    const cardio = cardioTo01(get(idxCardio));
+    const rec = to01(get(idxRec));
+    const mode = parseMode(get(idxMode));
+
+    let causa = idxCausa !== -1 ? to01(get(idxCausa)) : null;
+
+    const causaCodigo = idxCausaCodigo !== -1
+      ? toNumberOrNull(get(idxCausaCodigo))
+      : null;
+
+    if (causa === null && causaCodigo !== null) {
+      causa = causaCardiacaFromCodigo(causaCodigo);
+    }
+
+    const grupo = parseGrupoSanguineo(get(idxGrupo));
+
+    const imc = toNumberOrNull(get(idxImc));
+    const adrenalina = toNumberOrNull(get(idxAdrenalina));
+    const hta = to01(get(idxHta)) ?? 0;
+    const diabetes = to01(get(idxDiabetes)) ?? 0;
+    const tabaco = to01(get(idxTabaco)) ?? 0;
+    const colesterol = to01(get(idxColesterol)) ?? 0;
+    const alcohol = to01(get(idxAlcohol)) ?? 0;
 
     if (
       !Number.isFinite(edad) ||
@@ -399,13 +502,36 @@ async function validateAndParseCsv(file) {
     }
 
     rowsReady.push({
+      originalId: get(idxId),
+
       edad,
       capno,
       fem,
       cardio,
       rec,
       causa,
-      mode
+      mode,
+
+      causaCodigo,
+      causaLabel: causaLabelFromCode(causaCodigo, get(idxCausaLabel)),
+
+      imc,
+      grupoCode: grupo.code,
+      grupoLabel: grupo.label,
+      adrenalina,
+      hta,
+      diabetes,
+      tabaco,
+      colesterol,
+      alcohol,
+
+      resultadoMl: get(idxResultadoMl),
+      probabilidadMl: toNumberOrNull(get(idxProbabilidadMl)),
+      mlDataset: get(idxMlDataset),
+      mlModelo: get(idxMlModelo),
+      mlExperimento: get(idxMlExperimento),
+      mlSeed: toNumberOrNull(get(idxMlSeed)),
+      mlVersion: get(idxMlVersion)
     });
   }
 
@@ -441,9 +567,13 @@ async function prepareImportRows(rows) {
   );
 
   const existingKeys = new Set();
+  const existingOriginalIds = new Set();
 
   snapshot.docs.forEach((documentSnapshot) => {
     const data = documentSnapshot.data();
+
+    if (data.id) existingOriginalIds.add(data.id);
+    if (data.csv_original_id) existingOriginalIds.add(data.csv_original_id);
 
     existingKeys.add(
       buildDupKey({
@@ -497,10 +627,13 @@ async function prepareImportRows(rows) {
   let duplicatesInCsv = 0;
 
   computedRows.forEach((item) => {
-    if (uniqueByCsv.has(item.dupKey)) {
+    const originalId = item.row.originalId || "";
+    const csvKey = originalId ? `id:${normalize(originalId)}` : item.dupKey;
+
+    if (uniqueByCsv.has(csvKey)) {
       duplicatesInCsv++;
     } else {
-      uniqueByCsv.set(item.dupKey, item);
+      uniqueByCsv.set(csvKey, item);
     }
   });
 
@@ -509,7 +642,15 @@ async function prepareImportRows(rows) {
   let duplicatesInFirestore = 0;
 
   uniqueRows.forEach((item) => {
-    if (existingKeys.has(item.dupKey)) {
+    const originalId = item.row.originalId || "";
+
+    const duplicatedByOriginalId =
+      originalId && existingOriginalIds.has(originalId);
+
+    const duplicatedByClinicalData =
+      existingKeys.has(item.dupKey);
+
+    if (duplicatedByOriginalId || duplicatedByClinicalData) {
       duplicatesInFirestore++;
     } else {
       toImport.push(item);
@@ -520,6 +661,49 @@ async function prepareImportRows(rows) {
     toImport,
     totalDuplicates: duplicatesInCsv + duplicatesInFirestore
   };
+}
+
+function buildMlFeatures(row) {
+  const base = {
+    EDAD: row.edad,
+    SEXO: row.fem,
+    IMC: row.imc,
+    GRUPO_SANGUINEO: row.grupoCode,
+    CAUSA_FALLECIMIENTO_DANC: row.causaCodigo,
+    CARDIOCOMPRESION_EXTRAHOSPITALARIA: row.cardio,
+    RECUPERACION_ALGUN_MOMENTO: row.rec,
+    ADRENALINA_N: row.adrenalina,
+    HTA: row.hta,
+    DIABETES: row.diabetes,
+    TABACO: row.tabaco,
+    COLESTEROL: row.colesterol,
+    ALCOHOL: row.alcohol,
+    ADRENALINA_N_MISSING: row.adrenalina === null ? 1 : 0
+  };
+
+  if (row.mode === "MID_RCP") {
+    return {
+      ...base,
+      CAPNOMETRIA_MEDIO: row.capno,
+      CAPNOMETRIA_MEDIO_MISSING: 0
+    };
+  }
+
+  return {
+    ...base,
+    CAPNOMETRIA_TRANSFERENCIA: row.capno,
+    CAPNOMETRIA_TRANSFERENCIA_MISSING: 0
+  };
+}
+
+function shouldCreateMlDocument(row) {
+  return (
+    row.imc !== null ||
+    row.grupoCode !== null ||
+    row.adrenalina !== null ||
+    row.resultadoMl ||
+    row.probabilidadMl !== null
+  );
 }
 
 async function importRowsIntoFirestore(rowsToImport) {
@@ -556,13 +740,23 @@ async function importRowsIntoFirestore(rowsToImport) {
       cardio_manual: item.cardioTxt,
       rec_pulso: item.recTxt,
 
+      causa_fallecimiento_danc: item.row.causaLabel || "",
+      causa_fallecimiento_danc_codigo: item.row.causaCodigo ?? "",
+
+      hta: yesNoLabel(item.row.hta),
+      diabetes: yesNoLabel(item.row.diabetes),
+      tabaco: yesNoLabel(item.row.tabaco),
+      colesterol: yesNoLabel(item.row.colesterol),
+      alcohol: yesNoLabel(item.row.alcohol),
+
       indice: Number(item.rulesResult.indice.toFixed(4)),
       valido: item.validoTxt,
 
       fecha: serverTimestamp(),
 
-      has_ml_prediction: false,
-      importado_csv: true
+      has_ml_prediction: shouldCreateMlDocument(item.row),
+      importado_csv: true,
+      csv_original_id: item.row.originalId || null
     };
 
     const ref = doc(db, "predicciones", predictionId);
@@ -572,6 +766,63 @@ async function importRowsIntoFirestore(rowsToImport) {
 
       if (!snap.exists()) {
         tx.set(ref, prediction);
+
+        if (shouldCreateMlDocument(item.row)) {
+          const mlPrediction = {
+            ...prediction,
+
+            input_values: {
+              edad: item.row.edad,
+              sexo: item.row.fem,
+              imc: item.row.imc,
+              grupoSanguineo: item.row.grupoCode,
+              capnometria: item.row.capno,
+              adrenalina: item.row.adrenalina,
+
+              hta: item.row.hta,
+              diabetes: item.row.diabetes,
+              tabaco: item.row.tabaco,
+              colesterol: item.row.colesterol,
+              alcohol: item.row.alcohol,
+
+              causaFallecimientoDanc: item.row.causaCodigo,
+              causaCardiaca: item.row.causa,
+              cardioManual: item.row.cardio,
+              recuperacion: item.row.rec,
+
+              sexoLabel: item.row.fem === 1 ? "Mujer" : "Hombre",
+              grupoSanguineoLabel: item.row.grupoLabel,
+              htaLabel: yesNoLabelAccent(item.row.hta),
+              diabetesLabel: yesNoLabelAccent(item.row.diabetes),
+              tabacoLabel: yesNoLabelAccent(item.row.tabaco),
+              colesterolLabel: yesNoLabelAccent(item.row.colesterol),
+              alcoholLabel: yesNoLabelAccent(item.row.alcohol),
+              causaFallecimientoDancLabel: item.row.causaLabel,
+              causaCardiacaLabel: yesNoLabelAccent(item.row.causa),
+              cardioManualLabel: item.cardioTxt,
+              recuperacionLabel: yesNoLabelAccent(item.row.rec)
+            },
+
+            input_ml: buildMlFeatures(item.row),
+
+            ml_result: {
+              prediction: to01(item.row.resultadoMl),
+              label: item.row.resultadoMl || "",
+              label_legible: to01(item.row.resultadoMl) === 1 ? "Si" : to01(item.row.resultadoMl) === 0 ? "No" : "",
+              probability: item.row.probabilidadMl
+            },
+
+            model_info: {
+              dataset: item.row.mlDataset || predictionMode,
+              model: item.row.mlModelo || "",
+              experiment: item.row.mlExperimento || "",
+              seed: item.row.mlSeed,
+              version_modelo: item.row.mlVersion || ""
+            }
+          };
+
+          tx.set(doc(db, "predicciones_ml", predictionId), mlPrediction);
+        }
       }
     });
 

@@ -43,6 +43,10 @@ const filterGrupo = document.getElementById("filter-grupo");
 const filterAdrenalinaMin = document.getElementById("filter-adrenalina-min");
 const filterAdrenalinaMax = document.getElementById("filter-adrenalina-max");
 const filterColesterol = document.getElementById("filter-colesterol");
+const filterHta = document.getElementById("filter-hta");
+const filterDiabetes = document.getElementById("filter-diabetes");
+const filterTabaco = document.getElementById("filter-tabaco");
+const filterAlcohol = document.getElementById("filter-alcohol");
 
 const btnFilterClear = document.getElementById("btn-filter-clear");
 const btnFilterCancel = document.getElementById("btn-filter-cancel");
@@ -156,6 +160,17 @@ function safePercent(probability) {
   }
 
   return `${(Number(probability) * 100).toFixed(2)}%`;
+}
+
+function mapBinarySiNo(value) {
+  if (isDash(value)) return "—";
+
+  const normalized = String(value).trim();
+
+  if (normalized === "0" || normalized === "No") return "No";
+  if (normalized === "1" || normalized === "Si" || normalized === "Sí") return "Sí";
+
+  return value;
 }
 
 // ===================== SORT =====================
@@ -290,19 +305,33 @@ function renderPredictions(predictions) {
       getExtraValue(prediction, "colesterolLabel", "COLESTEROL")
     );
 
+    const causaFallecimiento = dash(
+      prediction.causa_fallecimiento_danc ||
+      getExtraValue(prediction, "causaFallecimientoDancLabel", "CAUSA_FALLECIMIENTO_DANC")
+    );
+
+    const hta = mapBinarySiNo(getExtraValue(prediction, "htaLabel", "HTA"));
+    const diabetes = mapBinarySiNo(getExtraValue(prediction, "diabetesLabel", "DIABETES"));
+    const tabaco = mapBinarySiNo(getExtraValue(prediction, "tabacoLabel", "TABACO"));
+    const alcohol = mapBinarySiNo(getExtraValue(prediction, "alcoholLabel", "ALCOHOL"));
+
     row.innerHTML = `
       <td>${index + 1}</td>
       <td>${dash(prediction.edad)}</td>
       <td>${mapSexo(prediction.femenino)}</td>
       <td>${dash(prediction.capnometria)}</td>
-      <td>${dash(prediction.causa_cardiaca)}</td>
+      <td>${causaFallecimiento}</td>
       <td>${dash(prediction.cardio_manual)}</td>
       <td>${dash(prediction.rec_pulso)}</td>
       <td>${momento}</td>
       <td>${imc}</td>
       <td>${grupo}</td>
       <td>${adrenalina}</td>
+      <td>${hta}</td>
+      <td>${diabetes}</td>
+      <td>${tabaco}</td>
       <td>${colesterol}</td>
+      <td>${alcohol}</td>
       <td>${mapResultado(prediction.valido)}</td>
       <td>${formatIndice(prediction.indice)}</td>
       <td>
@@ -494,6 +523,15 @@ function predictionMatchesFilters(prediction) {
   const imcMax = toNumberOrNull(filterImcMax.value);
   const adrenalinaMin = toNumberOrNull(filterAdrenalinaMin.value);
   const adrenalinaMax = toNumberOrNull(filterAdrenalinaMax.value);
+  const causaFallecimiento = dash(
+    prediction.causa_fallecimiento_danc ||
+    getExtraValue(prediction, "causaFallecimientoDancLabel", "CAUSA_FALLECIMIENTO_DANC")
+  );
+
+  const hta = mapBinarySiNo(getExtraValue(prediction, "htaLabel", "HTA"));
+  const diabetes = mapBinarySiNo(getExtraValue(prediction, "diabetesLabel", "DIABETES"));
+  const tabaco = mapBinarySiNo(getExtraValue(prediction, "tabacoLabel", "TABACO"));
+  const alcohol = mapBinarySiNo(getExtraValue(prediction, "alcoholLabel", "ALCOHOL"));
 
   const imc = getExtraValue(prediction, "imc", "IMC");
   const grupo = mapGrupoSanguineo(
@@ -532,7 +570,7 @@ if (filterColesterol.value && colesterol !== filterColesterol.value) {
     return false;
   }
 
-  if (filterCausa.value && normalizeSiNo(prediction.causa_cardiaca) !== filterCausa.value) {
+  if (filterCausa.value && causaFallecimiento !== filterCausa.value) {
     return false;
   }
 
@@ -541,6 +579,22 @@ if (filterColesterol.value && colesterol !== filterColesterol.value) {
   }
 
   if (filterRec.value && normalizeSiNo(prediction.rec_pulso) !== filterRec.value) {
+    return false;
+  }
+
+  if (filterHta.value && hta !== filterHta.value) {
+    return false;
+  }
+
+  if (filterDiabetes.value && diabetes !== filterDiabetes.value) {
+    return false;
+  }
+
+  if (filterTabaco.value && tabaco !== filterTabaco.value) {
+    return false;
+  }
+
+  if (filterAlcohol.value && alcohol !== filterAlcohol.value) {
     return false;
   }
 
@@ -575,6 +629,10 @@ function clearFilters() {
   filterAdrenalinaMin.value = "";
   filterAdrenalinaMax.value = "";
   filterColesterol.value = "";
+  filterHta.value = "";
+  filterDiabetes.value = "";
+  filterTabaco.value = "";
+  filterAlcohol.value = "";
 
   currentPredictions = allPredictions;
   renderPredictions(allPredictions);
@@ -628,7 +686,9 @@ function exportPredictionsCsv(predictions) {
     "Edad",
     "Femenino",
     "Capnometria",
-    "Causa_cardiaca",
+    "Causa_fallecimiento",
+    "Causa_fallecimiento_codigo",
+    "Causa_cardiaca_reglas",
     "Cardio_manual",
     "Recuperacion_pulso",
     "Prediction_mode",
@@ -636,7 +696,11 @@ function exportPredictionsCsv(predictions) {
     "IMC",
     "Grupo_sanguineo",
     "Adrenalina",
+    "HTA",
+    "Diabetes",
+    "Tabaco",
     "Colesterol",
+    "Alcohol",
     "Resultado_reglas",
     "Indice",
     "Resultado_ML",
@@ -672,6 +736,22 @@ function exportPredictionsCsv(predictions) {
       inputValues.colesterolLabel ?? inputMl.COLESTEROL
     );
 
+    const causaFallecimiento =
+      prediction.causa_fallecimiento_danc ||
+      inputValues.causaFallecimientoDancLabel ||
+      "";
+
+    const causaFallecimientoCodigo =
+      prediction.causa_fallecimiento_danc_codigo ??
+      inputValues.causaFallecimientoDanc ??
+      inputMl.CAUSA_FALLECIMIENTO_DANC ??
+      "";
+
+    const hta = mapBinarySiNo(inputValues.htaLabel ?? inputMl.HTA);
+    const diabetes = mapBinarySiNo(inputValues.diabetesLabel ?? inputMl.DIABETES);
+    const tabaco = mapBinarySiNo(inputValues.tabacoLabel ?? inputMl.TABACO);
+    const alcohol = mapBinarySiNo(inputValues.alcoholLabel ?? inputMl.ALCOHOL);
+
     const probability =
       mlResult.probability !== null && mlResult.probability !== undefined
         ? Number(mlResult.probability).toFixed(4)
@@ -682,6 +762,8 @@ function exportPredictionsCsv(predictions) {
       prediction.edad,
       prediction.femenino,
       prediction.capnometria,
+      causaFallecimiento,
+      causaFallecimientoCodigo,
       prediction.causa_cardiaca,
       prediction.cardio_manual,
       prediction.rec_pulso,
@@ -690,7 +772,11 @@ function exportPredictionsCsv(predictions) {
       imc,
       grupo,
       adrenalina,
+      hta,
+      diabetes,
+      tabaco,
       colesterol,
+      alcohol,
       mapResultado(prediction.valido),
       formatIndice(prediction.indice),
       getMlPredictionLabel(mlPrediction),

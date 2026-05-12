@@ -61,7 +61,7 @@
             </div>
 
             <div class="input-group">
-              <input id="capnometria" type="number" placeholder="Capnometría" required>
+              <input id="capnometria" type="number" placeholder="Capnometría (mejor valor a los 20 min)" required>
             </div>
           </div>
 
@@ -71,31 +71,62 @@
             </div>
 
             <div class="field-block">
-              <label for="colesterol">¿Colesterol?</label>
-              <div class="input-group select-group">
-                <span class="icon">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M7,10l5,5l5,-5z" fill="#042939"/>
-                  </svg>
-                </span>
-                <select id="colesterol" required>
-                  <option value="0">No</option>
-                  <option value="1">Sí</option>
-                </select>
-              </div>
+              <label>Antecedentes médicos</label>
+
+              <details class="multiselect">
+                <summary id="antecedentes-summary">Sin antecedentes seleccionados</summary>
+
+                <div class="multiselect-options">
+                  <label class="multiselect-option">
+                    <input type="checkbox" class="antecedente-checkbox" data-target="hta">
+                    HTA
+                  </label>
+
+                  <label class="multiselect-option">
+                    <input type="checkbox" class="antecedente-checkbox" data-target="diabetes">
+                    Diabetes
+                  </label>
+
+                  <label class="multiselect-option">
+                    <input type="checkbox" class="antecedente-checkbox" data-target="tabaco">
+                    Tabaco
+                  </label>
+
+                  <label class="multiselect-option">
+                    <input type="checkbox" class="antecedente-checkbox" data-target="alcohol">
+                    Alcohol
+                  </label>
+
+                  <label class="multiselect-option">
+                    <input type="checkbox" class="antecedente-checkbox" data-target="colesterol">
+                    Colesterol
+                  </label>
+                </div>
+              </details>
+
+              <input type="hidden" id="hta" value="0">
+              <input type="hidden" id="diabetes" value="0">
+              <input type="hidden" id="tabaco" value="0">
+              <input type="hidden" id="alcohol" value="0">
+              <input type="hidden" id="colesterol" value="0">
             </div>
 
             <div class="field-block">
-              <label for="causa-cardiaca">¿Causa cardíaca?</label>
+              <label for="causa-fallecimiento">Causa de fallecimiento</label>
               <div class="input-group select-group">
                 <span class="icon">
                   <svg viewBox="0 0 24 24">
                     <path d="M7,10l5,5l5,-5z" fill="#042939"/>
                   </svg>
                 </span>
-                <select id="causa-cardiaca" required>
-                  <option value="1">Sí</option>
-                  <option value="0">No</option>
+                <select id="causa-fallecimiento" required>
+                  <option value="0">Desconocido</option>
+                  <option value="1">TEP</option>
+                  <option value="2">Arritmia</option>
+                  <option value="3">Cardiopatía isquémica</option>
+                  <option value="4">Tóxicos</option>
+                  <option value="5">Muerte súbita</option>
+                  <option value="6">Otras</option>
                 </select>
               </div>
             </div>
@@ -139,6 +170,37 @@
 
     </div>
   </section>
+
+  <script>
+    const antecedentesCheckboxes = document.querySelectorAll(".antecedente-checkbox");
+    const antecedentesSummary = document.getElementById("antecedentes-summary");
+
+    function updateAntecedentes() {
+      const selected = [];
+
+      antecedentesCheckboxes.forEach((checkbox) => {
+        const hiddenInput = document.getElementById(checkbox.dataset.target);
+
+        if (hiddenInput) {
+          hiddenInput.value = checkbox.checked ? "1" : "0";
+        }
+
+        if (checkbox.checked) {
+          selected.push(checkbox.parentElement.textContent.trim());
+        }
+      });
+
+      antecedentesSummary.textContent = selected.length
+        ? selected.join(", ")
+        : "Sin antecedentes seleccionados";
+    }
+
+    antecedentesCheckboxes.forEach((checkbox) => {
+      checkbox.addEventListener("change", updateAntecedentes);
+    });
+
+    updateAntecedentes();
+  </script>
 
   <script type="module" src="../js/prediction/prediction.js?v=3"></script>
 </body>

@@ -40,6 +40,17 @@ function mapColesterol(value) {
   return value;
 }
 
+function mapBinarySiNo(value) {
+  if (isDash(value)) return "—";
+
+  const normalized = String(value).trim();
+
+  if (normalized === "0" || normalized === "No") return "No";
+  if (normalized === "1" || normalized === "Si" || normalized === "Sí") return "Sí";
+
+  return value;
+}
+
 function formatIndice(value) {
   if (isDash(value)) return "—";
   return Number(value).toFixed(3);
@@ -165,7 +176,15 @@ export function generatePredictionPdfFromHistorial(basePrediction, mlPrediction 
       : "Capnometría (transferencia)";
 
   addLine(capLabel, basePrediction.capnometria);
-  addLine("Causa principal del evento", basePrediction.causa_cardiaca);
+  addLine(
+    "Causa de fallecimiento",
+    basePrediction.causa_fallecimiento_danc ||
+      mlPrediction?.input_values?.causaFallecimientoDancLabel ||
+      mlPrediction?.input_ml?.CAUSA_FALLECIMIENTO_DANC ||
+      "—"
+  );
+
+  addLine("Causa cardíaca para reglas clínicas", basePrediction.causa_cardiaca);
   addLine("Cardiocompresión extrahospitalaria", basePrediction.cardio_manual);
   addLine("Recuperación de la circulación", basePrediction.rec_pulso);
 
@@ -179,7 +198,11 @@ export function generatePredictionPdfFromHistorial(basePrediction, mlPrediction 
       mapGrupoSanguineo(input.grupoSanguineoLabel ?? inputML.GRUPO_SANGUINEO)
     );
     addLine("Número de dosis de adrenalina", input.adrenalina ?? inputML.ADRENALINA_N);
+    addLine("HTA", mapBinarySiNo(input.htaLabel ?? inputML.HTA));
+    addLine("Diabetes", mapBinarySiNo(input.diabetesLabel ?? inputML.DIABETES));
+    addLine("Tabaco", mapBinarySiNo(input.tabacoLabel ?? inputML.TABACO));
     addLine("Colesterol", mapColesterol(input.colesterolLabel ?? inputML.COLESTEROL));
+    addLine("Alcohol", mapBinarySiNo(input.alcoholLabel ?? inputML.ALCOHOL));
   }
 
   addSectionTitle("RESULTADO DEL MODELO BASADO EN REGLAS CLÍNICAS");

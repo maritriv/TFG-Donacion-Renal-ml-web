@@ -44,14 +44,18 @@
                 <th>Edad</th>
                 <th>Sexo</th>
                 <th>Capnometría</th>
-                <th>Causa cardíaca</th>
+                <th>Causa fallecimiento</th>
                 <th>Cardiocompresión</th>
                 <th>Rec. del pulso</th>
                 <th>Momento</th>
                 <th>IMC</th>
                 <th>Grupo sanguíneo</th>
                 <th>Adrenalina</th>
+                <th>HTA</th>
+                <th>Diabetes</th>
+                <th>Tabaco</th>
                 <th>Colesterol</th>
+                <th>Alcohol</th>
                 <th>Resultado</th>
                 <th>Índice</th>
                 <th>Informe</th>
@@ -104,8 +108,8 @@
           <label>Sexo</label>
           <select id="filter-sexo">
             <option value="">Cualquiera</option>
-            <option value="H">Hombre</option>
-            <option value="M">Mujer</option>
+            <option value="Hombre">Hombre</option>
+            <option value="Mujer">Mujer</option>
           </select>
         </div>
 
@@ -118,11 +122,16 @@
         </div>
 
         <div class="filter-field">
-          <label>Causa cardíaca</label>
+          <label>Causa fallecimiento</label>
           <select id="filter-causa">
             <option value="">Cualquiera</option>
-            <option value="Si">Sí</option>
-            <option value="No">No</option>
+            <option value="Desconocido">Desconocido</option>
+            <option value="TEP">TEP</option>
+            <option value="Arritmia">Arritmia</option>
+            <option value="Cardiopatía isquémica">Cardiopatía isquémica</option>
+            <option value="Tóxicos">Tóxicos</option>
+            <option value="Muerte súbita">Muerte súbita</option>
+            <option value="Otras">Otras</option>
           </select>
         </div>
 
@@ -187,6 +196,42 @@
                 <option value="No">No</option>
                 <option value="Sí">Sí</option>
             </select>
+        </div>
+
+        <div class="filter-field">
+          <label>HTA</label>
+          <select id="filter-hta">
+            <option value="">Cualquiera</option>
+            <option value="No">No</option>
+            <option value="Sí">Sí</option>
+          </select>
+        </div>
+
+        <div class="filter-field">
+          <label>Diabetes</label>
+          <select id="filter-diabetes">
+            <option value="">Cualquiera</option>
+            <option value="No">No</option>
+            <option value="Sí">Sí</option>
+          </select>
+        </div>
+
+        <div class="filter-field">
+          <label>Tabaco</label>
+          <select id="filter-tabaco">
+            <option value="">Cualquiera</option>
+            <option value="No">No</option>
+            <option value="Sí">Sí</option>
+          </select>
+        </div>
+
+        <div class="filter-field">
+          <label>Alcohol</label>
+          <select id="filter-alcohol">
+            <option value="">Cualquiera</option>
+            <option value="No">No</option>
+            <option value="Sí">Sí</option>
+          </select>
         </div>
 
       </div>

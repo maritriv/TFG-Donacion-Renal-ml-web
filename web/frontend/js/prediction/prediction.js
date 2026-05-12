@@ -48,12 +48,35 @@ function generatePredictionId() {
 }
 
 function getNumber(id) {
-  return Number(document.getElementById(id).value);
+  const element = document.getElementById(id);
+
+  if (!element) {
+    throw new Error(`No se ha encontrado el campo "${id}".`);
+  }
+
+  return Number(element.value);
 }
 
 function getStringFromSelect(id) {
   const select = document.getElementById(id);
+
+  if (!select) {
+    throw new Error(`No se ha encontrado el selector "${id}".`);
+  }
+
+  if (!select.options || select.selectedIndex === undefined) {
+    throw new Error(`El campo "${id}" no es un select válido.`);
+  }
+
   return select.options[select.selectedIndex].text;
+}
+
+function getBooleanLabel(id) {
+  return getNumber(id) === 1 ? "Sí" : "No";
+}
+
+function getCausaCardiacaFromDanc(causaFallecimientoDanc) {
+  return [2, 3, 5].includes(Number(causaFallecimientoDanc)) ? 1 : 0;
 }
 
 function getFormValues() {
@@ -63,8 +86,16 @@ function getFormValues() {
   const grupoSanguineo = getNumber("grupo-sanguineo");
   const capnometria = getNumber("capnometria");
   const adrenalina = getNumber("adrenalina");
+
+  const hta = getNumber("hta");
+  const diabetes = getNumber("diabetes");
+  const tabaco = getNumber("tabaco");
   const colesterol = getNumber("colesterol");
-  const causaCardiaca = getNumber("causa-cardiaca");
+  const alcohol = getNumber("alcohol");
+
+  const causaFallecimientoDanc = getNumber("causa-fallecimiento");
+  const causaCardiaca = getCausaCardiacaFromDanc(causaFallecimientoDanc);
+
   const cardioManual = getNumber("cardio-manual");
   const recuperacion = getNumber("recuperacion");
 
@@ -75,15 +106,27 @@ function getFormValues() {
     grupoSanguineo,
     capnometria,
     adrenalina,
+
+    hta,
+    diabetes,
+    tabaco,
     colesterol,
+    alcohol,
+
+    causaFallecimientoDanc,
     causaCardiaca,
     cardioManual,
     recuperacion,
 
     sexoLabel: getStringFromSelect("sexo"),
     grupoSanguineoLabel: getStringFromSelect("grupo-sanguineo"),
-    colesterolLabel: getStringFromSelect("colesterol"),
-    causaCardiacaLabel: getStringFromSelect("causa-cardiaca"),
+    htaLabel: getBooleanLabel("hta"),
+    diabetesLabel: getBooleanLabel("diabetes"),
+    tabacoLabel: getBooleanLabel("tabaco"),
+    colesterolLabel: getBooleanLabel("colesterol"),
+    alcoholLabel: getBooleanLabel("alcohol"),
+    causaFallecimientoDancLabel: getStringFromSelect("causa-fallecimiento"),
+    causaCardiacaLabel: causaCardiaca === 1 ? "Sí" : "No",
     cardioManualLabel: getStringFromSelect("cardio-manual"),
     recuperacionLabel: getStringFromSelect("recuperacion")
   };
@@ -104,11 +147,15 @@ function buildMLFeatures(values) {
     SEXO: values.sexo,
     IMC: values.imc,
     GRUPO_SANGUINEO: values.grupoSanguineo,
-    CAUSA_FALLECIMIENTO_DANC: values.causaCardiaca,
+    CAUSA_FALLECIMIENTO_DANC: values.causaFallecimientoDanc,
     CARDIOCOMPRESION_EXTRAHOSPITALARIA: values.cardioManual,
     RECUPERACION_ALGUN_MOMENTO: values.recuperacion,
     ADRENALINA_N: values.adrenalina,
+    HTA: values.hta,
+    DIABETES: values.diabetes,
+    TABACO: values.tabaco,
     COLESTEROL: values.colesterol,
+    ALCOHOL: values.alcohol,
     ADRENALINA_N_MISSING: 0
   };
 
@@ -211,7 +258,6 @@ async function savePredictionToFirebase(
   const commonPrediction = {
     id: predictionId,
     source: "web",
-    schema_version: "web_fixed_v3",
 
     uid_medico: user?.uid || null,
     nombre_medico: doctorName,
@@ -222,6 +268,7 @@ async function savePredictionToFirebase(
     edad: String(values.edad),
     femenino: values.sexo === 1 ? "Si" : "No",
     capnometria: String(values.capnometria),
+
     causa_cardiaca: values.causaCardiaca === 1 ? "Si" : "No",
     cardio_manual: values.cardioManual === 1 ? "Manual" : "Mecánica",
     rec_pulso: values.recuperacion === 1 ? "Si" : "No",
@@ -229,13 +276,24 @@ async function savePredictionToFirebase(
     indice: Number(rulesResult.indice.toFixed(4)),
     valido: rulesResult.esValido ? "Si" : "No",
 
-    fecha: serverTimestamp()
+    fecha: serverTimestamp(),
+
+    has_ml_prediction: true
   };
 
   const extendedPrediction = {
     ...commonPrediction,
 
-    has_ml_prediction: true,
+    schema_version: "web_ml_features_v4",
+
+    causa_fallecimiento_danc: values.causaFallecimientoDancLabel,
+    causa_fallecimiento_danc_codigo: values.causaFallecimientoDanc,
+
+    hta: values.hta === 1 ? "Si" : "No",
+    diabetes: values.diabetes === 1 ? "Si" : "No",
+    tabaco: values.tabaco === 1 ? "Si" : "No",
+    colesterol: values.colesterol === 1 ? "Si" : "No",
+    alcohol: values.alcohol === 1 ? "Si" : "No",
 
     input_values: {
       ...values
@@ -263,10 +321,10 @@ async function savePredictionToFirebase(
       dataset: mode,
       model: "logistic_regression",
       version_modelo: isMid
-        ? "v1_mid_logistic_regression_real_seed_999"
-        : "v1_transfer_logistic_regression_real_plus_synthetic_seed_999",
-      experiment: isMid ? "real" : "real_plus_synthetic",
-      seed: 999
+        ? "v1_mid_logistic_regression_real_plus_synthetic_seed_123"
+        : "v1_transfer_logistic_regression_real_plus_synthetic_seed_123",
+      experiment: "real_plus_synthetic",
+      seed: 123
     }
   };
 

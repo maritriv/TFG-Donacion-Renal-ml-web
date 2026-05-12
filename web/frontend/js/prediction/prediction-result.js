@@ -96,11 +96,11 @@ function getMLModelInfo(data) {
   return {
     dataset: isMid ? "mid" : "transfer",
     model: "logistic_regression",
-    experiment: isMid ? "real" : "real_plus_synthetic",
-    seed: 999,
+    experiment: "real_plus_synthetic",
+    seed: 123,
     version: isMid
-      ? "v1_mid_logistic_regression_real_seed_999"
-      : "v1_transfer_logistic_regression_real_plus_synthetic_seed_999"
+      ? "v1_mid_logistic_regression_real_plus_synthetic_seed_123"
+      : "v1_transfer_logistic_regression_real_plus_synthetic_seed_123"
   };
 }
 
@@ -214,8 +214,13 @@ function generatePredictionPdf(data) {
   addLine("IMC", values.imc);
   addLine("Grupo sanguíneo", values.grupoSanguineoLabel);
   addLine("Número de dosis de adrenalina", values.adrenalina);
+  addLine("HTA", values.htaLabel);
+  addLine("Diabetes", values.diabetesLabel);
+  addLine("Tabaco", values.tabacoLabel);
   addLine("Colesterol", values.colesterolLabel);
-  addLine("Causa principal del evento", values.causaCardiacaLabel === "Sí" ? "Cardíaca" : "No cardíaca");
+  addLine("Alcohol", values.alcoholLabel);
+  addLine("Causa de fallecimiento", values.causaFallecimientoDancLabel);
+  addLine("Causa cardíaca para reglas clínicas", values.causaCardiacaLabel === "Sí" ? "Sí" : "No");
   addLine("Cardiocompresión extrahospitalaria", values.cardioManualLabel);
   addLine("Recuperación de la circulación", values.recuperacionLabel);
 
