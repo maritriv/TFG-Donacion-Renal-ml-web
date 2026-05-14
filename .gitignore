@@ -26,6 +26,13 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+# Firebase configuration (real credentials)
+web/frontend/firebase-config.js
+
+# Environment / local configuration
+.env
+.env.local
+
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
